@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "declaration": true,
+        "forceConsistentCasingInFileNames": true,
+        "inlineSourceMap": false,
+        "moduleResolution": "node",
+        "newLine": "LF",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitUseStrict": true,
+        "noUnusedLocals": true,
+        "preserveConstEnums": false,
+        "removeComments": true,
+        "sourceMap": false,
+        "strictNullChecks": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "target": "es2015"
+    },
+    "exclude": [
+        "dist",
+        "lib",
+        "lib.es2015",
+        "node_modules"
+    ]
+}

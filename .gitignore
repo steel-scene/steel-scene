@@ -1,0 +1,13 @@
+.alm
+.vscode
+.idea
+.vs
+npm-debug.log*
+node_modules
+dist
+lib
+lib.es2015
+src/**/*.js
+src/**/*.map
+test/**/*.js
+test/**/*.map

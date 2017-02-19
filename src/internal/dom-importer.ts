@@ -1,4 +1,4 @@
-import { Dictionary, ICurve, ILayer, IState, ITarget } from '../types';
+import { Dictionary, ICurve, ILayer, ITarget } from '../types';
 import { attr, selectAll } from '../internal';
 
 const layerSelector = 'layer';
@@ -14,28 +14,35 @@ export function elementToLayers(el: Element): Dictionary<ILayer> {
   const $layers = el.querySelectorAll(layerSelector);
   const layers: Dictionary<ILayer> = {};
   for (let i = 0, len = $layers.length; i < len; i++) {
-    const layer1 = elementToLayer($layers[i]);
-    layers[layer1.name] = layer1;
+    const $layer = $layers[i];
+    const layerName = attr($layer, nameAttr);
+    if (!layerName) {
+      throw '<layer> is missing "name"';
+    }
+    layers[layerName] = elementToLayer($layer);
   }
   return layers;
 }
 
 export function elementToLayer($layer: Element): ILayer {
-  const layerName = attr($layer, nameAttr);
-  if (!layerName) {
-    throw '<layer> is missing "name"';
-  }
+
 
   const layerState = attr($layer, stateAttr);
   if (!layerState) {
     throw '<layer> is missing "state"';
   }
 
-  const states: Dictionary<IState> = {};
+  const states: Dictionary<ITarget[]> = {};
   const $states = selectAll($layer, stateSelector);
   for (let i = 0, len = $states.length; i < len; i++) {
-    const state = elementToState($states[i]);
-    states[state.name] = state;
+    const $state = $states[i];
+    const stateName = attr($state, nameAttr);
+    if (!stateName) {
+      throw '<state> is missing "name"';
+    }
+
+    const state = elementToState($state);
+    states[stateName] = state;
   }
 
   const curves: ICurve[] = [];
@@ -45,29 +52,20 @@ export function elementToLayer($layer: Element): ILayer {
   }
 
   return {
-    name: layerName,
     state: layerState,
     states: states,
     curves: curves
   };
 }
 
-export function elementToState($state: Element): IState {
-  const stateName = attr($state, nameAttr);
-  if (!stateName) {
-    throw '<state> is missing "name"';
-  }
-
+export function elementToState($state: Element): ITarget[] {
   const targets: ITarget[] = [];
   const $targets = selectAll($state, targetSelector);
   for (let i = 0, len = $targets.length; i < len; i++) {
     targets.push(elementToTarget($targets[i]));
   }
 
-  return {
-    name: stateName,
-    targets: targets
-  };
+  return targets;
 };
 
 export function elementToTarget($target: Element): ITarget {

@@ -37,33 +37,23 @@ describe('dom-importer', () => {
     const layers = elementToLayers($element);
     assert.deepEqual(layers, {
       'box-animations': {
-        name: 'box-animations',
         state: 'hidden-left',
         states: {
-          'hidden-left': {
-            name: 'hidden-left',
-            targets: [
-              { ref: '#box1', opacity: '0', x: '-50px' },
-              { ref: '#box2', opacity: '0', x: '-150px' },
-              { ref: '#box3', opacity: '0', x: '-50px' }
-            ]
-          },
-          'hidden-right': {
-            name: 'hidden-right',
-            targets: [
-              { ref: '#box1', opacity: '0', x: '50px' },
-              { ref: '#box2', opacity: '0', x: '150px' },
-              { ref: '#box3', opacity: '0', x: '50px'}
-            ]
-          },
-          reset: {
-            name: 'reset',
-            targets: [
-              { ref: '#box1', opacity: '1', x: '0' },
-              { ref: '#box2', opacity: '1', x: '0' },
-              {  ref: '#box3',  opacity: '1', x: '0' }
-            ]
-          }
+          'hidden-left': [
+            { ref: '#box1', opacity: '0', x: '-50px' },
+            { ref: '#box2', opacity: '0', x: '-150px' },
+            { ref: '#box3', opacity: '0', x: '-50px' }
+          ],
+          'hidden-right': [
+            { ref: '#box1', opacity: '0', x: '50px' },
+            { ref: '#box2', opacity: '0', x: '150px' },
+            { ref: '#box3', opacity: '0', x: '50px' }
+          ],
+          reset: [
+            { ref: '#box1', opacity: '1', x: '0' },
+            { ref: '#box2', opacity: '1', x: '0' },
+            { ref: '#box3', opacity: '1', x: '0' }
+          ]
         },
         curves: [
           { state1: 'hidden-left', state2: 'reset', easing: 'ease-out', duration: 250 },
@@ -116,43 +106,19 @@ describe('dom-importer', () => {
 
     const layer = elementToLayer($layer);
     assert.deepEqual(layer, {
-      name: 'layer1',
       state: 'first',
       states: {
-        first: {
-          name: 'first',
-          targets: [
-            {
-              ref: '#box1',
-              x: '0'
-            },
-            {
-              ref: '#box2',
-              y: '0'
-            }
-          ]
-        },
-        second: {
-          name: 'second',
-          targets: [
-            {
-              ref: '#box1',
-              x: '90px'
-            },
-            {
-              ref: '#box2',
-              y: '90px'
-            }
-          ]
-        }
+        first: [
+          { ref: '#box1', x: '0' },
+          { ref: '#box2', y: '0' }
+        ],
+        second: [
+          { ref: '#box1', x: '90px' },
+          { ref: '#box2', y: '90px' }
+        ]
       },
       curves: [
-        {
-          state1: 'first',
-          state2: 'second',
-          duration: 1000,
-          easing: 'ease-in-out'
-        }
+        { state1: 'first', state2: 'second', duration: 1000, easing: 'ease-in-out' }
       ]
     });
   });
@@ -174,19 +140,16 @@ describe('dom-importer', () => {
     $state.appendChild($target2);
 
     const state = elementToState($state);
-    assert.deepEqual(state, {
-      name: 'first',
-      targets: [
-        {
-          ref: '#box1',
-          x: '0'
-        },
-        {
-          ref: '#box2',
-          y: '0'
-        }
-      ]
-    });
+    assert.deepEqual(state, [
+      {
+        ref: '#box1',
+        x: '0'
+      },
+      {
+        ref: '#box2',
+        y: '0'
+      }
+    ]);
   });
 
 

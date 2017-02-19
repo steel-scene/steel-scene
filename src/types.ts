@@ -3,9 +3,8 @@ export type Dictionary<T> = {
 };
 
 export interface ILayer {
-  name: string;
   state: string;
-  states: Dictionary<IState>;
+  states: Dictionary<ITarget[]>;
   curves: ICurve[];
 }
 
@@ -14,11 +13,6 @@ export interface ICurve {
   easing?: string | undefined;
   state1: string;
   state2: string;
-}
-
-export interface IState {
-  name: string;
-  targets: ITarget[];
 }
 
 export interface ITarget {

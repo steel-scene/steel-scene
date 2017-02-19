@@ -41,7 +41,7 @@ export function elementToLayer($layer: Element): ILayer {
   const curves: ICurve[] = [];
   const $curves = selectAll($layer, curveSelector);
   for (let i = 0, len = $curves.length; i < len; i++) {
-    curves.push(elementToCurve($states[i]));
+    curves.push(elementToCurve($curves[i]));
   }
 
   return {

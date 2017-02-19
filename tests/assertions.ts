@@ -1,5 +1,6 @@
-/// <reference path="../node_modules/@types/node/index.d" />
-/// <reference path="../node_modules/@types/mocha/index.d" />
+/// <reference path="../node_modules/@types/node/index.d.ts" />
+/// <reference path="../node_modules/@types/mocha/index.d.ts" />
+
 import * as assert from 'assert';
 
 export const almostEqual = (a: number, b: number, precision: number): void => {

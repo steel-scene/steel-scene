@@ -1,10 +1,77 @@
-import { elementToCurve, elementToLayer, elementToState, elementToTarget } from '../../src/internal';
+import { elementToCurve, elementToLayer, elementToLayers, elementToState, elementToTarget } from '../../src/internal';
 import * as  assert from 'assert';
 
 const jsdom = require('mocha-jsdom');
 
 describe('dom-importer', () => {
   jsdom();
+
+  it('should detect multiple layers in html', () => {
+    const $element = document.createElement('div');
+    $element.innerHTML = `
+      <div id="container">
+        <div id="box1">BOX 1</div>
+        <div id="box2">BOX 2</div>
+        <div id="box3">BOX 3</div>
+        <layer name="box-animations" state="hidden-left">
+            <state name="hidden-left">
+                <target ref="#box1" opacity="0" x="-50px" />
+                <target ref="#box2" opacity="0" x="-150px" />
+                <target ref="#box3" opacity="0" x="-50px" />
+            </state>
+            <state name="hidden-right">
+                <target ref="#box1" opacity="0" x="50px" />
+                <target ref="#box2" opacity="0" x="150px" />
+                <target ref="#box3" opacity="0" x="50px" />
+            </state>
+            <state name="reset">
+                <target ref="#box1" opacity="1" x="0" />
+                <target ref="#box2" opacity="1" x="0" />
+                <target ref="#box3" opacity="1" x="0" />
+            </state>
+            <curve state-1="hidden-left" state-2="reset" easing="ease-out" duration="250"></curve>
+            <curve state-1="hidden-right" state-2="reset" easing="ease-out" duration="250"></curve>
+        </layer>
+      </div>`;
+
+    const layers = elementToLayers($element);
+    assert.deepEqual(layers, {
+      'box-animations': {
+        name: 'box-animations',
+        state: 'hidden-left',
+        states: {
+          'hidden-left': {
+            name: 'hidden-left',
+            targets: [
+              { ref: '#box1', opacity: '0', x: '-50px' },
+              { ref: '#box2', opacity: '0', x: '-150px' },
+              { ref: '#box3', opacity: '0', x: '-50px' }
+            ]
+          },
+          'hidden-right': {
+            name: 'hidden-right',
+            targets: [
+              { ref: '#box1', opacity: '0', x: '50px' },
+              { ref: '#box2', opacity: '0', x: '150px' },
+              { ref: '#box3', opacity: '0', x: '50px'}
+            ]
+          },
+          reset: {
+            name: 'reset',
+            targets: [
+              { ref: '#box1', opacity: '1', x: '0' },
+              { ref: '#box2', opacity: '1', x: '0' },
+              {  ref: '#box3',  opacity: '1', x: '0' }
+            ]
+          }
+        },
+        curves: [
+          { state1: 'hidden-left', state2: 'reset', easing: 'ease-out', duration: 250 },
+          { state1: 'hidden-right', state2: 'reset', easing: 'ease-out', duration: 250 }
+        ]
+      }
+    });
+  });
 
   it('should translate a <layer> to a Layer', () => {
 

@@ -1,0 +1,24 @@
+<div id="container">
+    <div id="box1">BOX 1</div>
+    <div id="box2">BOX 2</div>
+    <div id="box3">BOX 3</div>
+    <layer name="fadeInLeft">
+        <state name="hidden-left">
+            <target ref="#box1" opacity="0" x="-50px" />
+            <target ref="#box2" opacity="0" x="-150px" />
+            <target ref="#box3" opacity="0" x="-50px" />
+        </state>
+        <state name="hidden-right">
+            <target ref="#box1" opacity="0" x="50px" />
+            <target ref="#box2" opacity="0" x="150px" />
+            <target ref="#box3" opacity="0" x="50px" />
+        </state>
+        <state name="reset">
+            <target ref="#box1" opacity="1" x="0" />
+            <target ref="#box2" opacity="1" x="0" />
+            <target ref="#box3" opacity="1" x="0" />
+        </state>
+        <curve state-1="hidden-left" state-2="reset" easing="ease-out" duration="250"></curve>
+        <curve state-1="hidden-right" state-2="reset" easing="ease-out" duration="250"></curve>
+    </layer>
+</div>

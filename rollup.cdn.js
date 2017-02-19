@@ -1,7 +1,7 @@
 var typescript = require('rollup-plugin-typescript');
 
 module.exports = {
-    entry: './src/main.ts',
+    entry: './src/index.ts',
     dest: './dist/blue-unicorn.js',
     format: 'iife',
     moduleName: 'bu',

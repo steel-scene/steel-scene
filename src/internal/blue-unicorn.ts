@@ -1,11 +1,11 @@
 import { Dictionary, IAnimationEngine, IBlueUnicorn, ICurve, ILayer } from '../types';
-import { resolveElement, elementToLayers } from '../internal';
+import { resolveElement, elementToLayers, attr } from '../internal';
 
 const frolicAttr = 'frolic';
 
 export class BlueUnicorn implements IBlueUnicorn {
-  private _engine: IAnimationEngine;  
-  private _layers: Dictionary<ILayer> = {};
+  private _engine: IAnimationEngine;
+  private layers: Dictionary<ILayer> = {};
 
   /**
    * Import layers from an existing DOM element
@@ -16,11 +16,27 @@ export class BlueUnicorn implements IBlueUnicorn {
     if (!el) {
       throw 'Could not frolic in ' + elOrSelector;
     }
-    if (el.getAttribute(frolicAttr) === 'true') {
+    if (attr(el, frolicAttr) === 'true') {
       throw 'Unicorn is frolicing in ' + elOrSelector + ' already!';
     }
-    self._layers = elementToLayers(el);
+    self.layers = elementToLayers(el);
+    self.reset();
     el.setAttribute(frolicAttr, 'true');
+
+    return self;
+  }
+
+  /**
+   * Sets all layers to their initial state
+   */
+  public reset = (): this => {
+    const self = this;
+    const layers = self.layers;
+    for (let layerName in layers) {
+      const layer = layers[layerName];
+      const state = layer.state;
+      self.set(layerName, state);
+    }
     return self;
   }
 
@@ -30,11 +46,12 @@ export class BlueUnicorn implements IBlueUnicorn {
   public set = (layerName: string, toStateName: string): this => {
     const self = this;
     // lookup layer and state
-    const layer = self._layers[layerName];
+    const layer = self.layers[layerName];
     const toState = layer.states[toStateName];
 
     // tell animation engine to set the state directly
     self._engine.set(toState);
+    layer.state = toStateName;
     return self;
   }
 
@@ -43,8 +60,8 @@ export class BlueUnicorn implements IBlueUnicorn {
    */
   public transition = (layerName: string, toStateName: string): this => {
     const self = this;
-    const layer = self._layers[layerName];
-    const fromStateName = layer.state;    
+    const layer = self.layers[layerName];
+    const fromStateName = layer.state;
 
     // ignore command if already in progress
     if (fromStateName === toStateName) {
@@ -60,20 +77,21 @@ export class BlueUnicorn implements IBlueUnicorn {
         || (c.state2 === fromStateName && c.state1 === toStateName)) {
           curve = c;
           break;
-      } 
+      }
     }
     if (!curve) {
       throw `No curves connect ${fromStateName} to ${toStateName}`;
     }
 
     // lookup start and end states
-    const fromState = layer.states[fromStateName];    
+    const fromState = layer.states[fromStateName];
     const toState = layer.states[toStateName];
 
     // tell animation engine to transition
     self._engine.transition(fromState, toState, curve);
+    layer.state = toStateName;
 
-    return self;     
+    return self;
   }
 
   /**
@@ -100,5 +118,5 @@ export class BlueUnicorn implements IBlueUnicorn {
     // tell animation engine to switch states for a layer
     self._engine.setPlayState(state);
     return self;
-  } 
+  }
 }

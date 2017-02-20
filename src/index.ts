@@ -14,3 +14,9 @@ export const {
 
 // export use directly because of typing visibility
 export const use = bu.use as { (a: IAnimationEngine): BlueUnicorn };
+
+if (window && window.document) {
+  document.addEventListener('DOMContentLoaded', () => {
+    bu.frolic('body');
+  });
+}

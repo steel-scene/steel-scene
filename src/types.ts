@@ -4,15 +4,16 @@ export type Dictionary<T> = {
 
 export interface IAnimationEngine {
   set(toState: ITarget[]): void;
-  setPlayState(state: 'paused' | 'running'): this; 
+  setPlayState(state: 'paused' | 'running'): void;
   setup(unicorn: IBlueUnicorn): void;
   transition(fromState: ITarget[], toState: ITarget[], curve: ICurve): void;
   teardown(unicorn: IBlueUnicorn): void;
 }
 
-export interface IBlueUnicorn {   
+export interface IBlueUnicorn {
   frolic(elOrSelector: Element | string): this;
-  setPlayState(state: 'paused' | 'running'): this; 
+  reset(): this;
+  setPlayState(state: 'paused' | 'running'): this;
   set(layerName: string, toStateName: string): this;
   transition(layerName: string, toStateName: string): this;
   use(animationEngine: IAnimationEngine): this;

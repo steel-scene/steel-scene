@@ -1,14 +1,22 @@
 import { IDictionary, IAnimationEngine, IBlueUnicorn, ICurve, ILayer, ITransition } from '../types';
-import { resolveElement, elementToLayers, assign } from '../internal';
+import { resolveElement, layersToElement, elementToLayers, assign } from '../internal';
 
 export class BlueUnicorn implements IBlueUnicorn {
   private _engine: IAnimationEngine;
   private layers: IDictionary<ILayer> = {};
 
+  public exportHTML = (): Element => {
+    return layersToElement(this.layers);
+  }
+
+  public exportJSON = (): IDictionary<ILayer> => {
+    return assign({}, this.layers);
+  }
+
   /**
    * Import layers from an existing DOM element
    */
-  public load = (options: Element | string, reset: boolean = true): this => {
+  public importHTML = (options: Element, reset: boolean = true): this => {
     const self = this;
 
     const el = resolveElement(options);
@@ -16,14 +24,14 @@ export class BlueUnicorn implements IBlueUnicorn {
       throw 'Could not load from ' + options;
     }
 
-    self.loadJSON(elementToLayers(el), reset);
+    self.importJSON(elementToLayers(el), reset);
     return self;
   }
 
   /**
    * Import layers from JSON
    */
-  public loadJSON = (layers: IDictionary<ILayer>, reset: boolean = true): this => {
+  public importJSON = (layers: IDictionary<ILayer>, reset: boolean = true): this => {
     const self = this;
     for (let layerName in layers) {
       self.layers[layerName] = assign(self.layers[layerName] || {}, layers[layerName]);

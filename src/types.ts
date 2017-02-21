@@ -9,8 +9,10 @@ export interface IAnimationEngine {
 }
 
 export interface IBlueUnicorn {
-  load(options: Element | string, reset?: boolean): this;
-  loadJSON(layers: IDictionary<ILayer>, reset?: boolean): this;
+  exportHTML(): Element;
+  exportJSON(): IDictionary<ILayer>;
+  importHTML(options: Element, reset?: boolean): this;
+  importJSON(layers: IDictionary<ILayer>, reset?: boolean): this;
   reset(): this;
   set(layerName: string, toStateName: string): this;
   setPlayState(state: 'paused' | 'running'): this;

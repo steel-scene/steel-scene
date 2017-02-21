@@ -6,18 +6,19 @@ const bu = new BlueUnicorn();
 
 // export default to namespace
 export const {
-  load,
+  importHTML,
+  importJSON,
   set,
   setPlayState,
   transition
 } = bu;
 
 // export directly because of typing visibility
-export const loadJSON = bu.loadJSON as { (layers: IDictionary<ILayer>, reset: boolean): BlueUnicorn };
+export const loadJSON = bu.importJSON as { (layers: IDictionary<ILayer>, reset: boolean): BlueUnicorn };
 export const use = bu.use as { (a: IAnimationEngine): BlueUnicorn };
 
 if (window && window.document) {
   document.addEventListener('DOMContentLoaded', () => {
-    bu.load(document.body);
+    bu.importHTML(document.body);
   });
 }

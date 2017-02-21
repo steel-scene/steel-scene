@@ -1,4 +1,4 @@
-import { Dictionary, ICurve, ILayer, ITarget } from '../types';
+import { IDictionary, ICurve, ILayer, ITarget } from '../types';
 import { attr, selectAll } from '../internal';
 
 const layerSelector = 'layer';
@@ -9,22 +9,24 @@ const nameAttr = 'name';
 const stateAttr = 'state';
 const state1Attr = 'state-1';
 const state2Attr = 'state-2';
+const durationAttr = 'duration';
+const easingAttr = 'easing';
 
-export function elementToLayers(el: Element): Dictionary<ILayer> {
+export function elementToLayers(el: Element): IDictionary<ILayer> {
   // find all layer elemenets
   const $layers = el.querySelectorAll(layerSelector);
 
   // assemble a JSON object for each layer and return as a dictionary
-  const layers: Dictionary<ILayer> = {};
+  const layers: IDictionary<ILayer> = {};
   for (let i = 0, len = $layers.length; i < len; i++) {
     const $layer = $layers[i];
 
-    // get the bane if the layer    
+    // get the bane if the layer
     const layerName = attr($layer, nameAttr);
     if (!layerName) {
-      throw '<layer> is missing "name"';
+      throw '<layer> is missing [name=""]';
     }
-    
+
     // read element to pull in the layer definition
     layers[layerName] = elementToLayer($layer);
   }
@@ -32,14 +34,8 @@ export function elementToLayers(el: Element): Dictionary<ILayer> {
 }
 
 export function elementToLayer($layer: Element): ILayer {
-  // get the required "state" that sets the initial state of the layer
-  const layerState = attr($layer, stateAttr);
-  if (!layerState) {
-    throw '<layer> is missing "state"';
-  }
-
   // find all "state" elements
-  const states: Dictionary<ITarget[]> = {};
+  const states: IDictionary<ITarget[]> = {};
 
   // assemble all states (nodes)... each ref refers to an element and its
   // properties instruct the animation engine what propertie to set
@@ -50,7 +46,7 @@ export function elementToLayer($layer: Element): ILayer {
     // find required "name" field
     const stateName = attr($state, nameAttr);
     if (!stateName) {
-      throw '<state> is missing "name"';
+      throw '<state> is missing [name=""]';
     }
 
     // read element to pull in state definiton
@@ -67,11 +63,17 @@ export function elementToLayer($layer: Element): ILayer {
     curves.push(elementToCurve($curves[i]));
   }
 
+  // get the required "state" that sets the initial state of the layer
+  const state = attr($layer, stateAttr);
+  if (!state) {
+    throw '<layer> is missing [state=""]';
+  }
+
   // return layer
   return {
-    state: layerState,
-    states: states,
-    curves: curves
+    curves,
+    state,
+    states
   };
 }
 
@@ -101,7 +103,7 @@ export function elementToTarget($target: Element): ITarget {
 
   // a referring element is required
   if (!target.ref) {
-    throw '<target> is missing "ref"';
+    throw '<target> is missing [ref=""]';
   }
 
   return target;
@@ -111,21 +113,21 @@ export function elementToCurve($curve: Element): ICurve {
   // starting node to which this edge connects
   const state1 = attr($curve, state1Attr);
   if (!state1) {
-    throw '<curve> is missing "state-1"';
+    throw '<curve> is missing [state-1=""]';
   }
 
   // ending node to which this edge connects
   const state2 = attr($curve, state2Attr);
   if (!state2) {
-    throw '<curve> is missing "state-2"';
+    throw '<curve> is missing [state-2=""]';
   }
 
   // parse duration to decimal if present
-  const durationStr = attr($curve, 'duration');
+  const durationStr = attr($curve, durationAttr);
   const duration = durationStr ? parseFloat(durationStr) : undefined;
 
   // grab easing definition (the animation engine will interpret this, so no parsing possible)
-  const easing = attr($curve, 'easing') || undefined;
+  const easing = attr($curve, easingAttr) || undefined;
 
   // return curve
   return {

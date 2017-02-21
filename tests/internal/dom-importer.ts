@@ -13,7 +13,7 @@ describe('dom-importer', () => {
         <div id="box1">BOX 1</div>
         <div id="box2">BOX 2</div>
         <div id="box3">BOX 3</div>
-        <layer name="box-animations" state="hidden-left">
+        <layer name="box-animations" state="hidden-left" default-easing="ease-out" default-duration="500">
             <state name="hidden-left">
                 <target ref="#box1" opacity="0" x="-50px" />
                 <target ref="#box2" opacity="0" x="-150px" />
@@ -29,8 +29,8 @@ describe('dom-importer', () => {
                 <target ref="#box2" opacity="1" x="0" />
                 <target ref="#box3" opacity="1" x="0" />
             </state>
-            <curve state-1="hidden-left" state-2="reset" easing="ease-out" duration="250"></curve>
-            <curve state-1="hidden-right" state-2="reset" easing="ease-out" duration="250"></curve>
+            <curve state-1="hidden-left" state-2="reset" easing="ease-out" duration="250" />
+            <curve state-1="hidden-right" state-2="reset" easing="ease-out" duration="250" />
         </layer>
       </div>`;
 

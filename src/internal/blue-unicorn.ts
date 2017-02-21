@@ -1,28 +1,36 @@
-import { Dictionary, IAnimationEngine, IBlueUnicorn, ICurve, ILayer } from '../types';
-import { resolveElement, elementToLayers, attr } from '../internal';
-
-const frolicAttr = 'frolic';
+import { IDictionary, IAnimationEngine, IBlueUnicorn, ICurve, ILayer, ITransition } from '../types';
+import { resolveElement, elementToLayers, assign } from '../internal';
 
 export class BlueUnicorn implements IBlueUnicorn {
   private _engine: IAnimationEngine;
-  private layers: Dictionary<ILayer> = {};
+  private layers: IDictionary<ILayer> = {};
 
   /**
    * Import layers from an existing DOM element
    */
-  public frolic = (elOrSelector: Element | string): this => {
+  public load = (options: Element | string, reset: boolean = true): this => {
     const self = this;
-    const el = resolveElement(elOrSelector);
-    if (!el) {
-      throw 'Could not frolic in ' + elOrSelector;
-    }
-    if (attr(el, frolicAttr) === 'true') {
-      throw 'Unicorn is frolicing in ' + elOrSelector + ' already!';
-    }
-    self.layers = elementToLayers(el);
-    self.reset();
-    el.setAttribute(frolicAttr, 'true');
 
+    const el = resolveElement(options);
+    if (!el) {
+      throw 'Could not load from ' + options;
+    }
+
+    self.loadJSON(elementToLayers(el), reset);
+    return self;
+  }
+
+  /**
+   * Import layers from JSON
+   */
+  public loadJSON = (layers: IDictionary<ILayer>, reset: boolean = true): this => {
+    const self = this;
+    for (let layerName in layers) {
+      self.layers[layerName] = assign(self.layers[layerName] || {}, layers[layerName]);
+    }
+    if (reset) {
+      self.reset();
+    }
     return self;
   }
 
@@ -69,26 +77,21 @@ export class BlueUnicorn implements IBlueUnicorn {
     }
 
     // find a suitable curve between the states
-    const curves = layer.curves;
-    let curve: ICurve | undefined = undefined;
-    for (let i = 0, len = curves.length; i < len; i++) {
-      const c = curves[i];
-      if ((c.state1 === fromStateName && c.state2 === toStateName)
-        || (c.state2 === fromStateName && c.state1 === toStateName)) {
-          curve = c;
-          break;
-      }
-    }
-    if (!curve) {
-      throw `No curves connect ${fromStateName} to ${toStateName}`;
-    }
+    const curves = findPath(layer.curves, fromStateName, toStateName);
 
-    // lookup start and end states
-    const fromState = layer.states[fromStateName];
-    const toState = layer.states[toStateName];
+    // lookup states for curves
+    const transitions: ITransition[] = [];
+    for (let i = 0, len = curves.length; i < len; i++) {
+      const curve = curves[i];
+      transitions.push({
+        curve: curve,
+        state1: layer.states[curve.state1],
+        state2: layer.states[curve.state2]
+      });
+    }
 
     // tell animation engine to transition
-    self._engine.transition(fromState, toState, curve);
+    self._engine.transition(transitions);
     layer.state = toStateName;
 
     return self;
@@ -119,4 +122,29 @@ export class BlueUnicorn implements IBlueUnicorn {
     self._engine.setPlayState(state);
     return self;
   }
+}
+
+function findPath(curves: ICurve[], fromName: string, toName: string): ICurve[] {
+  let directCurve: ICurve | undefined = undefined;
+  // look for a direct match
+  for (let i = 0, len = curves.length; i < len; i++) {
+    const c = curves[i] as ICurve;
+    // skip default curve
+    if (!c.state1 || !c.state2) {
+      continue;
+    }
+    // check for an exact match in either direction
+    if ((c.state1 === fromName && c.state2 === toName) || (c.state2 === fromName && c.state1 === toName)) {
+      directCurve = c;
+      break;
+    }
+  }
+
+  // return early if an exact match was found
+  if (directCurve) {
+    return [directCurve];
+  }
+
+  // todo: path finding
+  throw `Could not transition from ${fromName} to ${toName}`;
 }

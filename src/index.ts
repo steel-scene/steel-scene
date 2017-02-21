@@ -1,22 +1,23 @@
 import { BlueUnicorn } from './internal';
-import {IAnimationEngine} from './types';
+import { IAnimationEngine, ILayer, IDictionary } from './types';
 
 // initialize default instance
 const bu = new BlueUnicorn();
 
 // export default to namespace
 export const {
- frolic,
- set,
- setPlayState,
- transition
+  load,
+  set,
+  setPlayState,
+  transition
 } = bu;
 
-// export use directly because of typing visibility
+// export directly because of typing visibility
+export const loadJSON = bu.loadJSON as { (layers: IDictionary<ILayer>, reset: boolean): BlueUnicorn };
 export const use = bu.use as { (a: IAnimationEngine): BlueUnicorn };
 
 if (window && window.document) {
   document.addEventListener('DOMContentLoaded', () => {
-    bu.frolic('body');
+    bu.load(document.body);
   });
 }

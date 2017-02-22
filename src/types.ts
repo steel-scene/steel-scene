@@ -4,7 +4,7 @@ export interface IAnimationEngine {
   set(toState: ITarget[]): void;
   setPlayState(state: 'paused' | 'running'): void;
   setup(unicorn: IBlueUnicorn): void;
-  transition(transitions: ITransition[]): void;
+  transition(transitions: ITransition[], onStateChange: (stateName: string) => void): void;
   teardown(unicorn: IBlueUnicorn): void;
 }
 
@@ -16,7 +16,7 @@ export interface IBlueUnicorn {
   reset(): this;
   set(layerName: string, toStateName: string): this;
   setPlayState(state: 'paused' | 'running'): this;
-  transition(layerName: string, toStateName: string): this;
+  transition(layerName: string, ...states: string[]): this;
   use(animationEngine: IAnimationEngine): this;
 }
 

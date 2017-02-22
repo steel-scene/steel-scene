@@ -72,33 +72,49 @@ export class BlueUnicorn implements IBlueUnicorn {
   /**
    * Transition from the current state to this new state
    */
-  public transition = (layerName: string, toStateName: string): this => {
+  public transition = (layerName: string, ...states: string[]): this => {
     const self = this;
     const layer = self.layers[layerName];
-    const fromStateName = layer.state;
-
-    // ignore command if already in progress
-    if (fromStateName === toStateName) {
-      return self;
-    }
 
     // find a suitable curve between the states
-    const curves = findPath(layer.curves, fromStateName, toStateName);
-
-    // lookup states for curves
+    let fromStateName = layer.state;
     const transitions: ITransition[] = [];
-    for (let i = 0, len = curves.length; i < len; i++) {
-      const curve = curves[i];
+    for (let x = 0, xlen = states.length; x < xlen; x++) {
+      const toStateName = states[x];
+
+      // assemble a new curve to send to the animation engine
+      const curve: ICurve = {
+        duration: layer.transitionDuration,
+        easing: layer.transitionEasing,
+        state1: fromStateName,
+        state2: toStateName
+      };
+
+      // find a state to state definition for the curve settings
+      const foundCurve = findPath(layer.curves, fromStateName, toStateName);
+      if (foundCurve !== nil) {
+        // override defaults
+        assign(curve, foundCurve);
+      }
+
+      if (!curve.duration) {
+        throw `Missing duration between ${fromStateName} and ${toStateName}`;
+      }
+
+      // add to the list of transitions
       transitions.push({
         curve: curve,
-        state1: layer.states[curve.state1],
-        state2: layer.states[curve.state2]
+        state1: layer.states[fromStateName],
+        state2: layer.states[toStateName]
       });
+
+      fromStateName = toStateName;
     }
 
     // tell animation engine to transition
-    self._engine.transition(transitions);
-    layer.state = toStateName;
+    self._engine.transition(transitions, (stateName: string) => {
+      layer.state = stateName;
+    });
 
     return self;
   }
@@ -130,8 +146,7 @@ export class BlueUnicorn implements IBlueUnicorn {
   }
 }
 
-function findPath(curves: ICurve[], fromName: string, toName: string): ICurve[] {
-  let directCurve: ICurve | undefined = nil;
+function findPath(curves: ICurve[], fromName: string, toName: string): ICurve | undefined {
   // look for a direct match
   for (let i = 0, len = curves.length; i < len; i++) {
     const c = curves[i] as ICurve;
@@ -141,16 +156,8 @@ function findPath(curves: ICurve[], fromName: string, toName: string): ICurve[] 
     }
     // check for an exact match in either direction
     if ((c.state1 === fromName && c.state2 === toName) || (c.state2 === fromName && c.state1 === toName)) {
-      directCurve = c;
-      break;
+      return c;
     }
   }
-
-  // return early if an exact match was found
-  if (directCurve) {
-    return [directCurve];
-  }
-
-  // todo: path finding
-  throw `Could not transition from ${fromName} to ${toName}`;
+  return undefined;
 }

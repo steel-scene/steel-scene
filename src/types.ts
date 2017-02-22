@@ -11,7 +11,7 @@ export interface IAnimationEngine {
 export interface IBlueUnicorn {
   exportHTML(): Element;
   exportJSON(): IDictionary<ILayer>;
-  importHTML(options: Element, reset?: boolean): this;
+  importHTML(el: Element, reset?: boolean): this;
   importJSON(layers: IDictionary<ILayer>, reset?: boolean): this;
   reset(): this;
   set(layerName: string, toStateName: string): this;
@@ -21,9 +21,11 @@ export interface IBlueUnicorn {
 }
 
 export interface ILayer {
+  curves: ICurve[];
   state: string;
   states: IDictionary<ITarget[]>;
-  curves: ICurve[];
+  transitionDuration?: number | undefined;
+  transitionEasing?: string | undefined;
 }
 
 export interface ICurve {
@@ -31,7 +33,6 @@ export interface ICurve {
   easing?: string | undefined;
   state1: string;
   state2: string;
-  isDefault?: boolean | undefined;
 }
 
 export interface ITransition {

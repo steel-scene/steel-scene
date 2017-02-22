@@ -1,5 +1,6 @@
 export * from './blue-unicorn';
-export * from './dom-exporter';
-export * from './dom-importer';
+export * from './dom';
 export * from './elements';
 export * from './objects';
+export * from './resources';
+

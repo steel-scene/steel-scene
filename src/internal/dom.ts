@@ -1,16 +1,78 @@
-import { IDictionary, ICurve, ILayer, ITarget } from '../types';
-import { attr, selectAll } from '../internal';
+import { ICurve, IDictionary, ILayer, ITarget } from '../types';
+import { attr, selectAll, missingArg, nil } from '../internal';
 
 const layerSelector = 'layer';
 const stateSelector = 'state';
 const curveSelector = 'curve';
 const targetSelector = 'target';
 const nameAttr = 'name';
+const refAttr = 'ref';
 const stateAttr = 'state';
 const state1Attr = 'state-1';
 const state2Attr = 'state-2';
 const durationAttr = 'duration';
 const easingAttr = 'easing';
+const transitionDurationAttr = 'transition-duration';
+const transitionEasingAttr = 'transition-easing';
+
+export function layersToElement(layers: IDictionary<ILayer>): Element {
+  const $container = document.createElement('div');
+  for (const layerName in layers) {
+    $container.appendChild(layerToElement(layerName, layers[layerName]));
+  }
+  return $container;
+}
+
+export function layerToElement(layerName: string, layer: ILayer): Element {
+  const $layer = document.createElement(layerSelector);
+  $layer.setAttribute(nameAttr, layerName);
+  $layer.setAttribute(stateAttr, layer.state);
+
+  if (layer.transitionDuration) {
+    $layer.setAttribute(transitionDurationAttr, layer.transitionDuration.toString());
+  }
+  if (layer.transitionEasing) {
+    $layer.setAttribute(transitionEasingAttr, layer.transitionEasing);
+  }
+
+  const states = layer.states;
+  for (let stateName in states) {
+    $layer.appendChild(stateToElement(stateName, states[stateName]));
+  }
+
+  const curves = layer.curves;
+  for (let i = 0, len = curves.length; i < len; i++) {
+    $layer.appendChild(curveToElement(curves[i]));
+  }
+
+  return $layer;
+}
+
+export function curveToElement(curve: ICurve): Element {
+  const $curve = document.createElement(curveSelector);
+  if (curve.duration) {
+    $curve.setAttribute(durationAttr, curve.duration.toString());
+  }
+  if (curve.easing) {
+    $curve.setAttribute(easingAttr, curve.easing);
+  }
+  $curve.setAttribute(state1Attr, curve.state1);
+  $curve.setAttribute(state2Attr, curve.state2);
+  return $curve;
+}
+
+export function stateToElement(stateName: string, targets: ITarget[]): Element {
+  const $state = document.createElement(stateSelector);
+  for (let i = 0, len = targets.length; i < len; i++) {
+    const target = targets[i];
+    const $target = document.createElement(targetSelector);
+    for (let propName in target) {
+      $target.setAttribute(propName, target[propName]);
+    }
+    $state.appendChild($target);
+  }
+  return $state;
+}
 
 export function elementToLayers(el: Element): IDictionary<ILayer> {
   // find all layer elemenets
@@ -24,7 +86,7 @@ export function elementToLayers(el: Element): IDictionary<ILayer> {
     // get the bane if the layer
     const layerName = attr($layer, nameAttr);
     if (!layerName) {
-      throw '<layer> is missing [name=""]';
+      throw missingArg(nameAttr);
     }
 
     // read element to pull in the layer definition
@@ -46,7 +108,7 @@ export function elementToLayer($layer: Element): ILayer {
     // find required "name" field
     const stateName = attr($state, nameAttr);
     if (!stateName) {
-      throw '<state> is missing [name=""]';
+      throw missingArg(nameAttr);
     }
 
     // read element to pull in state definiton
@@ -66,14 +128,20 @@ export function elementToLayer($layer: Element): ILayer {
   // get the required "state" that sets the initial state of the layer
   const state = attr($layer, stateAttr);
   if (!state) {
-    throw '<layer> is missing [state=""]';
+      throw missingArg(stateAttr);
   }
+
+  const transitionEasing = attr($layer, transitionEasingAttr);
+  const transitionDurationStr = attr($layer, transitionDurationAttr) || nil;
+  const transitionDuration = transitionDurationStr ? parseFloat(transitionDurationStr) : nil;
 
   // return layer
   return {
     curves,
     state,
-    states
+    states,
+    transitionDuration,
+    transitionEasing
   };
 }
 
@@ -103,7 +171,7 @@ export function elementToTarget($target: Element): ITarget {
 
   // a referring element is required
   if (!target.ref) {
-    throw '<target> is missing [ref=""]';
+      throw missingArg(refAttr);
   }
 
   return target;
@@ -113,13 +181,13 @@ export function elementToCurve($curve: Element): ICurve {
   // starting node to which this edge connects
   const state1 = attr($curve, state1Attr);
   if (!state1) {
-    throw '<curve> is missing [state-1=""]';
+      throw missingArg(state1Attr);
   }
 
   // ending node to which this edge connects
   const state2 = attr($curve, state2Attr);
   if (!state2) {
-    throw '<curve> is missing [state-2=""]';
+    throw missingArg(state2Attr);
   }
 
   // parse duration to decimal if present

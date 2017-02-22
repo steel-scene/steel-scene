@@ -1,5 +1,5 @@
 import { IDictionary, IAnimationEngine, IBlueUnicorn, ICurve, ILayer, ITransition } from '../types';
-import { resolveElement, layersToElement, elementToLayers, assign } from '../internal';
+import { resolveElement, layersToElement, elementToLayers, assign, nil } from '../internal';
 
 export class BlueUnicorn implements IBlueUnicorn {
   private _engine: IAnimationEngine;
@@ -49,9 +49,7 @@ export class BlueUnicorn implements IBlueUnicorn {
     const self = this;
     const layers = self.layers;
     for (let layerName in layers) {
-      const layer = layers[layerName];
-      const state = layer.state;
-      self.set(layerName, state);
+      self.set(layerName, layers[layerName].state);
     }
     return self;
   }
@@ -133,7 +131,7 @@ export class BlueUnicorn implements IBlueUnicorn {
 }
 
 function findPath(curves: ICurve[], fromName: string, toName: string): ICurve[] {
-  let directCurve: ICurve | undefined = undefined;
+  let directCurve: ICurve | undefined = nil;
   // look for a direct match
   for (let i = 0, len = curves.length; i < len; i++) {
     const c = curves[i] as ICurve;

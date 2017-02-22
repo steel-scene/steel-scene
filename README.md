@@ -49,8 +49,8 @@ There are two different ways to build out animations with BlueUnicorn.  The most
 ```
 **In the example, we have a ```box-animations``` layer which will start in the ```hidden-left``` state.**
 
-- The layer contains two states, ```hidden-left``` and ```reset```.  
-- Each state modifies the opacity and x property of ```#box1```.  
+- The layer contains two states, ```hidden-left``` and ```reset```.
+- Each state modifies the opacity and x property of ```#box1```.
 - The curve instructs the animation engine to transition for 250 milliseconds and move along an ```ease-out``` curve.
 
 **Here is an example of how to do the same thing using JavaScript:**
@@ -70,8 +70,14 @@ bu.loadJSON({
 
 **To transition from one state to another:**
 ```js
-// to transition to reset
+// transitions to reset
 bu.transition('box-animations', 'reset');
+```
+
+**To transition between multiple states, keep adding more state names:**
+```js
+// transitions to reset and then to hidden-left
+bu.transition('box-animations', 'reset', 'hidden-left', ...);
 ```
 
 **To move directly to a state without a transition:**

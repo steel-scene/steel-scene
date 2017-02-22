@@ -1,6 +1,6 @@
 # BlueUnicorn
 
-*Animation Prototyping*
+*Prototype Production Animations*
 
 [![npm version](https://badge.fury.io/js/blue-unicorn.svg)](https://badge.fury.io/js/blue-unicorn)
 [![Build Status](https://travis-ci.org/blue-unicorn/blue-unicorn.svg?branch=master)](https://travis-ci.org/blue-unicorn/blue-unicorn)
@@ -8,11 +8,12 @@
 
 ## Features
 
-- (todo)
+- Create animations using plain HTML or JSON
+- Zero config
 
 ## Why use BlueUnicorn?
 
-- (todo)
+- Build animations without thinking about specific frameworks
 
 > Power this project up with 🌟s,  [^ star it please](https://github.com/blue-unicorn/blue-unicorn/stargazers).
 
@@ -31,7 +32,62 @@ npm install blue-unicorn --save
 ```
 
 ## Getting Started
-- (todo)
+There are two different ways to build out animations with BlueUnicorn.  The most straightforward way is writing it as HTML before the page loads
+
+```html
+<div id="box1">BOX 1</div>
+
+<layer name="box-animations" state="hidden-left">
+    <state name="hidden-left">
+        <target ref="#box1" opacity="0" x="-50px" />
+    </state>
+    <state name="reset">
+        <target ref="#box1" opacity="1" x="0" />
+    </state>
+    <curve state-1="hidden-left" state-2="reset" easing="ease-out" duration="250" />
+</layer>
+```
+
+Layers contain related groups of objects.  Each layer has states and curves.
+States contain the targets they modify and curves define how to get from one state to another.
+
+In the example, we have defined a layer named "box-animations" which will start in the "hidden-left" state. The layer contains two states, "hidden-left" and "reset".  Each state modifies the opacity and x property of "#box1".  The layer also contains a curve that states that when moving between those two states, the animation engine should take 250 milliseconds and move along an easing curve.
+
+Here is an example of how to do the same thing using JavaScript:
+
+```js
+bu.loadJSON({
+    'box-animations': {
+        state: 'hidden-left',
+        states: {
+            'hidden-left': [{ ref: '#box1', opacity: '0', x: '-50px' }],
+            reset: [{ ref: '#box1', opacity: '1', x: '0' }]
+        },
+        curves: [{ state1: 'hidden-left', state2: 'reset', easing: 'ease-out', duration: 250 }]
+    }
+})
+```
+
+To transition from one state to another:
+```js
+// to transition to reset
+bu.transition('box-animations', 'reset');
+```
+
+To move directly to a state without a transition:
+```js
+// go direction to reset, do not pass GO, do not collect $200
+bu.set('box-animations', 'reset');
+```
+
+Here are some other handy functions
+```js
+// resets all layers to their starting state
+bu.reset();
+
+// import new layers from an element
+bu.importHTML(element);
+```
 
 ## What's next?
 

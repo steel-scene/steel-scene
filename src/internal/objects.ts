@@ -11,9 +11,15 @@ export const assign: typeof assignSignature = function (target: {}): {} {
       continue;
     }
     for (const nextKey in nextSource) {
-      if (nextSource.hasOwnProperty(nextKey)) {
-        target[nextKey] = nextSource[nextKey];
+      if (!nextSource.hasOwnProperty(nextKey)) {
+        continue;
       }
+      const val = nextSource[nextKey];
+      // tslint:disable-next-line:no-null-keyword
+      if (val === null || val === undefined) {
+        continue;
+      }
+      target[nextKey] = val;
     }
   }
 

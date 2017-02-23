@@ -56,7 +56,7 @@ There are two different ways to build out animations with BlueUnicorn.  The most
 **Here is an example of how to do the same thing using JavaScript:**
 
 ```js
-bu.loadJSON({
+bu.importJSON({
     'box-animations': {
         state: 'hidden-left',
         states: {

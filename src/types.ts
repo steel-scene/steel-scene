@@ -1,47 +1,76 @@
-export type IDictionary<T> = { [name: string]: T};
+export type IDictionary<T> = { [name: string]: T };
+export interface IList<T> { [key: number]: T; length: number; };
 
-export interface IAnimationEngine {
-  set(toState: ITarget[]): void;
-  setPlayState(state: 'paused' | 'running'): void;
-  setup(unicorn: IBlueUnicorn): void;
-  transition(transitions: ITransition[], onStateChange: (stateName: string) => void): void;
-  teardown(unicorn: IBlueUnicorn): void;
-}
-
-export interface IBlueUnicorn {
+export interface IBlunicorn {
   exportHTML(): Element;
-  exportJSON(): IDictionary<ILayer>;
+  exportJSON(): IDictionary<ISceneJSON>;
   importHTML(el: Element, reset?: boolean): this;
-  importJSON(layers: IDictionary<ILayer>, reset?: boolean): this;
+  importJSON(scenes: IDictionary<ISceneJSON>, reset?: boolean): this;
   reset(): this;
-  set(layerName: string, toStateName: string): this;
-  setPlayState(state: 'paused' | 'running'): this;
-  transition(layerName: string, ...states: string[]): this;
+  set(sceneName: string, toStateName: string): this;
+  transition(sceneName: string, ...states: string[]): this;
   use(animationEngine: IAnimationEngine): this;
 }
 
-export interface ILayer {
-  curves: ICurve[];
-  state: string;
-  states: IDictionary<ITarget[]>;
-  transitionDuration?: number | undefined;
-  transitionEasing?: string | undefined;
+export interface IAnimationEngine {
+  set(toState: IState): void;
+  transition(transitions: IEngineTransition[], onStateChange: (stateName: string) => void): void;
 }
 
-export interface ICurve {
+export interface IEngineTransition {
+  duration: number;
+  easing: string | undefined;
+  fromState: IState;
+  toState: IState;
+}
+
+export interface IScene {
+  defaultTransition?: ITransition;
+  defaultState: IState;
+  currentState: string;
+  states: IDictionary<IState>;
+  transitions: IDictionary<ITransition>;
+}
+
+export interface IState {
   duration: number | undefined;
-  easing?: string | undefined;
-  state1: string;
-  state2: string;
+  easing: string | undefined;
+  name: string;
+  targets: ITarget[];
+  transition: ITransition | undefined;
 }
 
 export interface ITransition {
-  curve?: ICurve;
-  state1: ITarget[];
-  state2: ITarget[];
+  duration: number | undefined;
+  easing: string | undefined;
+  name: string | undefined;
 }
 
 export interface ITarget {
+  ref: string;
+  [name: string]: string;
+}
+
+export interface ISceneJSON {
+  states: IDictionary<IStateJSON>;
+  transitions: IDictionary<ITransitionJSON>;
+}
+
+export interface IStateJSON {
+  default?: boolean | undefined;
+  duration?: number | undefined;
+  easing?: string | undefined;
+  targets: ITargetJSON[];
+  transition?: string | undefined;
+}
+
+export interface ITransitionJSON {
+  default?: boolean | undefined;
+  duration?: number | undefined;
+  easing?: string | undefined;
+}
+
+export interface ITargetJSON {
   ref: string;
   [name: string]: string;
 }

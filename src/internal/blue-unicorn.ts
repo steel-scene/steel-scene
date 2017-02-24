@@ -1,20 +1,43 @@
-import { IDictionary, IAnimationEngine, IBlueUnicorn, ICurve, ILayer, ITransition } from '../types';
-import { resolveElement, layersToElement, elementToLayers, assign, nil } from '../internal';
+import {
+  IAnimationEngine,
+  IBlunicorn,
+  IDictionary,
+  IEngineTransition,
+  IScene,
+  ISceneJSON
+} from '../types';
 
-export class BlueUnicorn implements IBlueUnicorn {
+import {
+  assign,
+  elementToScenes,
+  fromScene,
+  missingArg,
+  resolveElement,
+  scenesToElement,
+  toScene
+} from '../internal';
+
+export class BlueUnicorn implements IBlunicorn {
   private _engine: IAnimationEngine;
-  private layers: IDictionary<ILayer> = {};
+  private _scenes: IDictionary<IScene> = {};
 
   public exportHTML = (): Element => {
-    return layersToElement(this.layers);
+    const self = this;
+    const json = self.exportJSON();
+    return scenesToElement(json);
   }
 
-  public exportJSON = (): IDictionary<ILayer> => {
-    return assign({}, this.layers);
+  public exportJSON = (): IDictionary<ISceneJSON> => {
+    const self = this;
+    const scenes = {};
+    for (let sceneName in self._scenes) {
+      scenes[sceneName] = fromScene(self._scenes[sceneName]);
+    }
+    return scenes;
   }
 
   /**
-   * Import layers from an existing DOM element
+   * Import scenes from an existing DOM element
    */
   public importHTML = (options: Element, reset: boolean = true): this => {
     const self = this;
@@ -24,17 +47,18 @@ export class BlueUnicorn implements IBlueUnicorn {
       throw 'Could not load from ' + options;
     }
 
-    self.importJSON(elementToLayers(el), reset);
+    self.importJSON(elementToScenes(el), reset);
     return self;
   }
 
   /**
-   * Import layers from JSON
+   * Import scenes from JSON
    */
-  public importJSON = (layers: IDictionary<ILayer>, reset: boolean = true): this => {
+  public importJSON = (scenes: IDictionary<ISceneJSON>, reset: boolean = true): this => {
     const self = this;
-    for (let layerName in layers) {
-      self.layers[layerName] = assign(self.layers[layerName] || {}, layers[layerName]);
+    for (let sceneName in scenes) {
+      const newScene = toScene(scenes[sceneName]);
+      self._scenes[sceneName] = assign(self._scenes[sceneName] || {}, newScene);
     }
     if (reset) {
       self.reset();
@@ -43,13 +67,13 @@ export class BlueUnicorn implements IBlueUnicorn {
   }
 
   /**
-   * Sets all layers to their initial state
+   * Sets all scenes to their initial state
    */
   public reset = (): this => {
     const self = this;
-    const layers = self.layers;
-    for (let layerName in layers) {
-      self.set(layerName, layers[layerName].state);
+    const scenes = self._scenes;
+    for (let sceneName in scenes) {
+      self._engine.set(scenes[sceneName].defaultState);
     }
     return self;
   }
@@ -57,63 +81,68 @@ export class BlueUnicorn implements IBlueUnicorn {
   /**
    * Move directly to a state.  Do not pass GO.  Do not collect $200
    */
-  public set = (layerName: string, toStateName: string): this => {
+  public set = (sceneName: string, toStateName: string): this => {
     const self = this;
-    // lookup layer and state
-    const layer = self.layers[layerName];
-    const toState = layer.states[toStateName];
+    // lookup scene and state
+    const scene = self._scenes[sceneName];
+    const toState = scene.states[toStateName];
 
     // tell animation engine to set the state directly
     self._engine.set(toState);
-    layer.state = toStateName;
+    scene.currentState = toStateName;
     return self;
   }
 
   /**
    * Transition from the current state to this new state
    */
-  public transition = (layerName: string, ...states: string[]): this => {
+  public transition = (sceneName: string, ...states: string[]): this => {
     const self = this;
-    const layer = self.layers[layerName];
+    const scene = self._scenes[sceneName];
 
-    // find a suitable curve between the states
-    let fromStateName = layer.state;
-    const transitions: ITransition[] = [];
+    // find a suitable transition between the states
+    let fromStateName = scene.currentState;
+    const transitions: IEngineTransition[] = [];
     for (let x = 0, xlen = states.length; x < xlen; x++) {
       const toStateName = states[x];
+      const fromState = scene.states[fromStateName];
+      const toState = scene.states[toStateName];
 
-      // assemble a new curve to send to the animation engine
-      const curve: ICurve = {
-        duration: layer.transitionDuration,
-        easing: layer.transitionEasing,
-        state1: fromStateName,
-        state2: toStateName
-      };
+      // get duration from cascade of durations
+      const duration: number | undefined = toState.duration
+        || (toState.transition && toState.transition.duration)
+        || (scene.defaultTransition && scene.defaultTransition.duration);
 
-      // find a state to state definition for the curve settings
-      const foundCurve = findPath(layer.curves, fromStateName, toStateName);
-      if (foundCurve !== nil) {
-        // override defaults
-        assign(curve, foundCurve);
+      // the engine won't know what to do without a duration
+      if (!duration) {
+        throw missingArg('duration');
       }
 
-      if (!curve.duration) {
-        throw `Missing duration between ${fromStateName} and ${toStateName}`;
+      // get easing from cascade of easings
+      const easing: string | undefined = toState.easing
+        || (toState.transition && toState.transition.easing)
+        || (scene.defaultTransition && scene.defaultTransition.easing);
+
+      // note: might be able to pass without an easing, not sure if good or bad
+      if (!easing) {
+        throw missingArg('easing');
       }
 
       // add to the list of transitions
       transitions.push({
-        curve: curve,
-        state1: layer.states[fromStateName],
-        state2: layer.states[toStateName]
+        duration,
+        easing,
+        toState,
+        fromState
       });
 
       fromStateName = toStateName;
     }
 
     // tell animation engine to transition
+    // need some work on this, possible that this would be called repeatedly
     self._engine.transition(transitions, (stateName: string) => {
-      layer.state = stateName;
+      scene.currentState = stateName;
     });
 
     return self;
@@ -124,40 +153,8 @@ export class BlueUnicorn implements IBlueUnicorn {
    */
   public use = (animationEngine: IAnimationEngine): this => {
     const self = this;
-    // if another animation engine was registered, fire hook to teardown
-    if (self._engine) {
-      self._engine.teardown(self);
-    }
-
-    // set new animation engine and call setup
+    // set new animation engine
     self._engine = animationEngine;
-    animationEngine.setup(self);
     return self;
   }
-
-  /**
-   * Change the play state with this command
-   */
-  public setPlayState = (state: 'paused' | 'running'): this => {
-    const self = this;
-    // tell animation engine to switch states for a layer
-    self._engine.setPlayState(state);
-    return self;
-  }
-}
-
-function findPath(curves: ICurve[], fromName: string, toName: string): ICurve | undefined {
-  // look for a direct match
-  for (let i = 0, len = curves.length; i < len; i++) {
-    const c = curves[i] as ICurve;
-    // skip default curve
-    if (!c.state1 || !c.state2) {
-      continue;
-    }
-    // check for an exact match in either direction
-    if ((c.state1 === fromName && c.state2 === toName) || (c.state2 === fromName && c.state1 === toName)) {
-      return c;
-    }
-  }
-  return undefined;
 }

@@ -1,5 +1,5 @@
 import { BlueUnicorn } from './internal';
-import { IAnimationEngine, ILayer, IDictionary } from './types';
+import { IAnimationEngine, ISceneJSON, IDictionary } from './types';
 
 // initialize default instance
 const bu = new BlueUnicorn();
@@ -11,12 +11,11 @@ export const {
   importHTML,
   reset,
   set,
-  setPlayState,
   transition
 } = bu;
 
 // export directly because of typing visibility
-export const importJSON = bu.importJSON as { (layers: IDictionary<ILayer>, reset: boolean): BlueUnicorn };
+export const importJSON = bu.importJSON as { (scenes: IDictionary<ISceneJSON>, reset: boolean): BlueUnicorn };
 export const use = bu.use as { (a: IAnimationEngine): BlueUnicorn };
 
 /**

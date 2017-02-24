@@ -1,6 +1,6 @@
 # BlueUnicorn
 
-*Prototype Production Animations*
+*Animation devtools for production code*
 
 [![npm version](https://badge.fury.io/js/blue-unicorn.svg)](https://badge.fury.io/js/blue-unicorn)
 [![Build Status](https://travis-ci.org/blue-unicorn/blue-unicorn.svg?branch=master)](https://travis-ci.org/blue-unicorn/blue-unicorn)
@@ -37,61 +37,74 @@ There are two different ways to build out animations with BlueUnicorn.  The most
 ```html
 <div id="box1">BOX 1</div>
 
-<layer name="box-animations" state="hidden-left">
-    <state name="hidden-left">
+<scene name="boxes">
+    <state name="hiddenLeft" default>
         <target ref="#box1" opacity="0" x="-50px" />
     </state>
     <state name="reset">
         <target ref="#box1" opacity="1" x="0" />
     </state>
-    <curve state-1="hidden-left" state-2="reset" easing="ease-out" duration="250" />
-</layer>
+    <transition easing="ease-out" duration="250" default />
+</scene>
 ```
-**In the example, we have a ```box-animations``` layer which will start in the ```hidden-left``` state.**
+**In the example, we have a ```boxes``` scene which will start in the ```hiddenLeft``` state.**
 
-- The layer contains two states, ```hidden-left``` and ```reset```.
+- The scene contains two states, ```hiddenLeft``` and ```reset```.  ```hiddenLeft``` is marked as the ```default```.
 - Each state modifies the opacity and x property of ```#box1```.
-- The curve instructs the animation engine to transition for 250 milliseconds and move along an ```ease-out``` curve.
+- The ```default``` transition instructs the animation engine to transition for 250 milliseconds and move along an ```ease-out``` curve.
 
-**Here is an example of how to do the same thing using JavaScript:**
+**Here is an example of how to do the same thing using JSON:**
 
 ```js
-bu.importJSON({
-    'box-animations': {
-        state: 'hidden-left',
+const json = {
+    boxes: {
         states: {
-            'hidden-left': [{ ref: '#box1', opacity: '0', x: '-50px' }],
-            reset: [{ ref: '#box1', opacity: '1', x: '0' }]
+            hiddenLeft: {
+                default: true,
+                targets: [
+                    { ref: '#box1', opacity: '0', x: '-50px' }
+                ]
+            },
+            reset: {
+                targets: [
+                    { ref: '#box1', opacity: '1', x: '0' }
+                ]
+            }
         },
-        curves: [{ state1: 'hidden-left', state2: 'reset', easing: 'ease-out', duration: 250 }]
+        transitions: {
+            _: {
+                {  default: true, easing: 'ease-out', duration: 250 }
+            }
+        }
     }
-})
+};
+bu.importJSON(json);
 ```
 
 **To transition from one state to another:**
 ```js
 // transitions to reset
-bu.transition('box-animations', 'reset');
+bu.transition('boxes', 'reset');
 ```
 
 **To transition between multiple states, keep adding more state names:**
 ```js
 // transitions to reset and then to hidden-left
-bu.transition('box-animations', 'reset', 'hidden-left', ...);
+bu.transition('boxes', 'reset', 'hiddenLeft', ...);
 ```
 
 **To move directly to a state without a transition:**
 ```js
 // go directly to reset, do not pass GO, do not collect $200
-bu.set('box-animations', 'reset');
+bu.set('boxes', 'reset');
 ```
 
 **Here are some other handy functions**
 ```js
-// resets all layers to their starting state
+// resets all scenes to their starting state
 bu.reset();
 
-// import new layers from an element
+// import new scenes from an element
 bu.importHTML(element);
 ```
 

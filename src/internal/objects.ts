@@ -1,3 +1,6 @@
+import { IDictionary } from '../types';
+import { nil } from '../internal';
+
 export const assignSignature = <T1 extends T2, T2>(target: T1, ...sources: (T1 | T2)[]): T1 => {
   throw 'nope';
 };
@@ -24,4 +27,22 @@ export const assign: typeof assignSignature = function (target: {}): {} {
   }
 
   return target;
+};
+
+export function propertyHead<T>(dictionary: IDictionary<T>, predicate: { (t: T): boolean; }): T | undefined {
+  if (!dictionary) {
+    return nil;
+  }
+
+  for (let key in dictionary)  {
+    const item = dictionary[key];
+    if (predicate(item)) {
+      return item;
+    }
+  }
+  return nil;
+}
+
+export const convertToFloat = (numericString: string | undefined): number | undefined => {
+  return !numericString ? nil : parseFloat(numericString);
 };

@@ -1,5 +1,21 @@
-import { IAnimationEngine, IBlunicorn, IDictionary, IEngineTransition, IScene, ISceneJSON } from '../types';
-import { resolveElement, scenesToElement, elementToScenes, assign, missingArg } from '../internal';
+import {
+  IAnimationEngine,
+  IBlunicorn,
+  IDictionary,
+  IEngineTransition,
+  IScene,
+  ISceneJSON
+} from '../types';
+
+import {
+  assign,
+  elementToScenes,
+  fromScene,
+  missingArg,
+  resolveElement,
+  scenesToElement,
+  toScene
+} from '../internal';
 
 export class BlueUnicorn implements IBlunicorn {
   private _engine: IAnimationEngine;
@@ -12,7 +28,12 @@ export class BlueUnicorn implements IBlunicorn {
   }
 
   public exportJSON = (): IDictionary<ISceneJSON> => {
-    return assign({} as IDictionary<ISceneJSON>, this._scenes);
+    const self = this;
+    const scenes = {};
+    for (let sceneName in self._scenes) {
+      scenes[sceneName] = fromScene(self._scenes[sceneName]);
+    }
+    return scenes;
   }
 
   /**
@@ -36,7 +57,8 @@ export class BlueUnicorn implements IBlunicorn {
   public importJSON = (scenes: IDictionary<ISceneJSON>, reset: boolean = true): this => {
     const self = this;
     for (let sceneName in scenes) {
-      self._scenes[sceneName] = assign(self._scenes[sceneName] || {}, scenes[sceneName]);
+      const newScene = toScene(scenes[sceneName]);
+      self._scenes[sceneName] = assign(self._scenes[sceneName] || {}, newScene);
     }
     if (reset) {
       self.reset();

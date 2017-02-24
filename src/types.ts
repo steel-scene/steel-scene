@@ -29,7 +29,7 @@ export interface IScene {
   defaultState: IState;
   currentState: string;
   states: IDictionary<IState>;
-  transitions: ITransition[];
+  transitions: IDictionary<ITransition>;
 }
 
 export interface IState {

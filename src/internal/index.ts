@@ -1,5 +1,6 @@
 export * from './blue-unicorn';
-export * from './dom-converter';
+export * from './convert-dom';
+export * from './convert-json';
 export * from './elements';
 export * from './lists';
 export * from './objects';

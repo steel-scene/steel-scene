@@ -136,7 +136,6 @@ export function elementToScene($scene: Element): ISceneJSON {
   };
 }
 
-
 function sceneElementToStates($scene: Element): IDictionary<IStateJSON> {
   // find all "state" elements
   const states: IDictionary<IStateJSON> = {};

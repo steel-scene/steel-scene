@@ -1,4 +1,4 @@
-# Steel Scene
+# SteelScene
 
 *Animation devtools for production code*
 
@@ -8,12 +8,13 @@
 
 ## Features
 
-- Create animations using plain HTML or JSON
-- Zero config
-
-## Why use BlueUnicorn?
-
+- Animate existing sites from localhost using the devtools
 - Build animations without thinking about specific frameworks
+
+## Why use SteelScene?
+
+- Human readable code in HTML or JSON
+- Zero config
 
 > Power this project up with 🌟s,  [^ star it please](https://github.com/steel-scene/steel-scene/stargazers).
 
@@ -32,7 +33,7 @@ npm install steel-scene --save
 ```
 
 ## Getting Started
-There are two different ways to build out animations with BlueUnicorn.  The most straightforward way is writing it as HTML before the page loads
+There are two different ways to build out animations with SteelScene.  The most straightforward way is writing it as HTML before the page loads
 
 ```html
 <div id="box1">BOX 1</div>

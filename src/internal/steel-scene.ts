@@ -1,6 +1,6 @@
 import {
   IAnimationEngine,
-  IBlunicorn,
+  ISteelScene,
   IDictionary,
   IEngineTransition,
   IScene,
@@ -17,7 +17,7 @@ import {
   toScene
 } from '../internal';
 
-export class BlueUnicorn implements IBlunicorn {
+export class SteelScene implements ISteelScene {
   private _engine: IAnimationEngine;
   private _scenes: IDictionary<IScene> = {};
 

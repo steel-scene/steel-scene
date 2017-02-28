@@ -14,10 +14,10 @@ import {
   selectAll
 } from '../internal';
 
-const sceneSelector = 'scene';
-const stateSelector = 'state';
-const transitionSelector = 'transition';
-const targetSelector = 'target';
+const sceneSelector = 's-scene';
+const stateSelector = 's-state';
+const transitionSelector = 's-transition';
+const targetSelector = 's-target';
 const nameAttr = 'name';
 const refAttr = 'ref';
 const durationAttr = 'duration';

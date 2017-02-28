@@ -1,7 +1,7 @@
 export type IDictionary<T> = { [name: string]: T };
 export interface IList<T> { [key: number]: T; length: number; };
 
-export interface IBlunicorn {
+export interface ISteelScene {
   exportHTML(): Element;
   exportJSON(): IDictionary<ISceneJSON>;
   importHTML(el: Element, reset?: boolean): this;

@@ -16,19 +16,19 @@ describe('dom', () => {
     it('should detect multiple scenes in html', () => {
       const $element = document.createElement('div');
       $element.innerHTML = `
-      <scene name="boxes">
-          <transition duration="1500" easing="Power2.easeOut" default />
-          <transition name="fast" duration="500" easing="Power3.easeInOut" />
+      <s-scene name="boxes">
+          <s-transition duration="1500" easing="Power2.easeOut" default />
+          <s-transition name="fast" duration="500" easing="Power3.easeInOut" />
 
-          <state name="C" transition="fast" default>
-              <target ref="#box1" x="0" y="0" rotation="0deg" />
-              <target ref="#box2" x="0" y="0" rotation="0deg" />
-          </state>
-          <state name="NE" duration="1000" easing="Cubic.easeInOut">
-              <target ref="#box1" x="100px" y="-100px" rotation="45deg" />
-              <target ref="#box2" x="100px" y="-100px" rotation="45deg" />
-          </state>
-      </scene>`;
+          <s-state name="C" transition="fast" default>
+              <s-target ref="#box1" x="0" y="0" rotation="0deg" />
+              <s-target ref="#box2" x="0" y="0" rotation="0deg" />
+          </s-state>
+          <s-state name="NE" duration="1000" easing="Cubic.easeInOut">
+              <s-target ref="#box1" x="100px" y="-100px" rotation="45deg" />
+              <s-target ref="#box2" x="100px" y="-100px" rotation="45deg" />
+          </s-state>
+      </s-scene>`;
 
       const scenes = elementToScenes($element);
       assert.deepEqual(scenes, {
@@ -75,40 +75,40 @@ describe('dom', () => {
   describe('elementToScene', () => {
     it('should translate a <scene> to a Scene', () => {
 
-      const $target1a = document.createElement('target');
+      const $target1a = document.createElement('s-target');
       $target1a.setAttribute('ref', '#box1');
       $target1a.setAttribute('x', '0');
 
-      const $target2a = document.createElement('target');
+      const $target2a = document.createElement('s-target');
       $target2a.setAttribute('ref', '#box2');
       $target2a.setAttribute('y', '0');
 
-      const $statea = document.createElement('state');
+      const $statea = document.createElement('s-state');
       $statea.setAttribute('name', 'first');
       $statea.setAttribute('default', '');
 
       $statea.appendChild($target1a);
       $statea.appendChild($target2a);
 
-      const $target1b = document.createElement('target');
+      const $target1b = document.createElement('s-target');
       $target1b.setAttribute('ref', '#box1');
       $target1b.setAttribute('x', '90px');
 
-      const $target2b = document.createElement('target');
+      const $target2b = document.createElement('s-target');
       $target2b.setAttribute('ref', '#box2');
       $target2b.setAttribute('y', '90px');
 
-      const $stateb = document.createElement('state');
+      const $stateb = document.createElement('s-state');
       $stateb.setAttribute('name', 'second');
       $stateb.appendChild($target1b);
       $stateb.appendChild($target2b);
 
-      const $transition = document.createElement('transition');
+      const $transition = document.createElement('s-transition');
       $transition.setAttribute('default', '');
       $transition.setAttribute('duration', '1000');
       $transition.setAttribute('easing', 'ease-in-out');
 
-      const $scene = document.createElement('scene');
+      const $scene = document.createElement('s-scene');
       $scene.appendChild($statea);
       $scene.appendChild($stateb);
       $scene.appendChild($transition);
@@ -151,15 +151,15 @@ describe('dom', () => {
   describe('elementToState', () => {
     it('should translate a <state> to a State', () => {
 
-      const $target1 = document.createElement('target');
+      const $target1 = document.createElement('s-target');
       $target1.setAttribute('ref', '#box1');
       $target1.setAttribute('x', '0');
 
-      const $target2 = document.createElement('target');
+      const $target2 = document.createElement('s-target');
       $target2.setAttribute('ref', '#box2');
       $target2.setAttribute('y', '0');
 
-      const $state = document.createElement('state');
+      const $state = document.createElement('s-state');
       $state.setAttribute('name', 'first');
       $state.appendChild($target1);
       $state.appendChild($target2);
@@ -186,7 +186,7 @@ describe('dom', () => {
 
   describe('elementToTarget', () => {
     it('should translate a <target> to a Target', () => {
-      const $target = document.createElement('target');
+      const $target = document.createElement('s-target');
       $target.setAttribute('ref', '#box');
       $target.setAttribute('x', '0');
       $target.setAttribute('y', '90px');
@@ -202,7 +202,7 @@ describe('dom', () => {
 
   describe('elementToTransition', () => {
     it('should translate a <transition> to a Transition', () => {
-      const $transition = document.createElement('transition');
+      const $transition = document.createElement('s-transition');
       $transition.setAttribute('duration', '1000');
       $transition.setAttribute('easing', 'ease-in-out');
 

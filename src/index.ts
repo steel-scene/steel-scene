@@ -1,8 +1,8 @@
-import { BlueUnicorn } from './internal';
+import { SteelScene } from './internal';
 import { IAnimationEngine, ISceneJSON, IDictionary } from './types';
 
 // initialize default instance
-const bu = new BlueUnicorn();
+const bu = new SteelScene();
 
 // export default to namespace
 export const {
@@ -15,8 +15,8 @@ export const {
 } = bu;
 
 // export directly because of typing visibility
-export const importJSON = bu.importJSON as { (scenes: IDictionary<ISceneJSON>, reset: boolean): BlueUnicorn };
-export const use = bu.use as { (a: IAnimationEngine): BlueUnicorn };
+export const importJSON = bu.importJSON as { (scenes: IDictionary<ISceneJSON>, reset: boolean): SteelScene };
+export const use = bu.use as { (a: IAnimationEngine): SteelScene };
 
 /**
  * Export all types to "types"

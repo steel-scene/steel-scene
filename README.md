@@ -1,10 +1,10 @@
-# BlueUnicorn
+# Steel Scene
 
 *Animation devtools for production code*
 
-[![npm version](https://badge.fury.io/js/blue-unicorn.svg)](https://badge.fury.io/js/blue-unicorn)
-[![Build Status](https://travis-ci.org/blue-unicorn/blue-unicorn.svg?branch=master)](https://travis-ci.org/blue-unicorn/blue-unicorn)
-[![Downloads](https://img.shields.io/npm/dm/blue-unicorn.svg)](https://www.npmjs.com/package/blue-unicorn)
+[![npm version](https://badge.fury.io/js/steel-scene.svg)](https://badge.fury.io/js/steel-scene)
+[![Build Status](https://travis-ci.org/steel-scene/steel-scene.svg?branch=master)](https://travis-ci.org/steel-scene/steel-scene)
+[![Downloads](https://img.shields.io/npm/dm/steel-scene.svg)](https://www.npmjs.com/package/steel-scene)
 
 ## Features
 
@@ -15,20 +15,20 @@
 
 - Build animations without thinking about specific frameworks
 
-> Power this project up with 🌟s,  [^ star it please](https://github.com/blue-unicorn/blue-unicorn/stargazers).
+> Power this project up with 🌟s,  [^ star it please](https://github.com/steel-scene/steel-scene/stargazers).
 
 ## Setup
 
 ### Setup for use in the browser
 Include this script
 ```html
-<script src="https://unpkg.com/blue-unicorn/dist/blue-unicorn.min.js"></script>
+<script src="https://unpkg.com/steel-scene/dist/steel-scene.min.js"></script>
 ```
 
 ### Setup for bundling (or if you want typings for TypeScript)
 
 ```bash
-npm install blue-unicorn --save
+npm install steel-scene --save
 ```
 
 ## Getting Started

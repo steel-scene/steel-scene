@@ -79,34 +79,34 @@ const json = {
         }
     }
 };
-bu.importJSON(json);
+steel.importJSON(json);
 ```
 
 **To transition from one state to another:**
 ```js
 // transitions to reset
-bu.transition('boxes', 'reset');
+steel.transition('boxes', 'reset');
 ```
 
 **To transition between multiple states, keep adding more state names:**
 ```js
 // transitions to reset and then to hidden-left
-bu.transition('boxes', 'reset', 'hiddenLeft', ...);
+steel.transition('boxes', 'reset', 'hiddenLeft', ...);
 ```
 
 **To move directly to a state without a transition:**
 ```js
 // go directly to reset, do not pass GO, do not collect $200
-bu.set('boxes', 'reset');
+steel.set('boxes', 'reset');
 ```
 
 **Here are some other handy functions**
 ```js
 // resets all scenes to their starting state
-bu.reset();
+steel.reset();
 
 // import new scenes from an element
-bu.importHTML(element);
+steel.importHTML(element);
 ```
 
 ## What's next?

@@ -4,7 +4,7 @@ module.exports = {
     entry: './src/index.ts',
     dest: './dist/steel-scene.js',
     format: 'iife',
-    moduleName: 'bu',
+    moduleName: 'steel',
     plugins: [
         typescript({
             "allowUnreachableCode": false,

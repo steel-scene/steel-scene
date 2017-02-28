@@ -38,15 +38,15 @@ There are two different ways to build out animations with SteelScene.  The most 
 ```html
 <div id="box1">BOX 1</div>
 
-<scene name="boxes">
-    <state name="hiddenLeft" default>
-        <target ref="#box1" opacity="0" x="-50px" />
-    </state>
-    <state name="reset">
-        <target ref="#box1" opacity="1" x="0" />
-    </state>
-    <transition easing="ease-out" duration="250" default />
-</scene>
+<s-scene name="boxes">
+    <s-state name="hiddenLeft" default>
+        <s-target ref="#box1" opacity="0" x="-50px" />
+    </s-state>
+    <s-state name="reset">
+        <s-target ref="#box1" opacity="1" x="0" />
+    </s-state>
+    <s-transition easing="ease-out" duration="250" default />
+</s-scene>
 ```
 **In the example, we have a ```boxes``` scene which will start in the ```hiddenLeft``` state.**
 

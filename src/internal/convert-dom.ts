@@ -23,10 +23,7 @@ const refAttr = 'ref';
 const durationAttr = 'duration';
 const easingAttr = 'easing';
 const defaultAttr = 'default';
-const transitionAttr = 'transition';
 const defaultName = '_';
-
-const statePropertyExclusions: string[] = [nameAttr, durationAttr, defaultAttr, easingAttr, transitionAttr];
 
 export function scenesToElement(scenes: IDictionary<ISceneJSON>): Element {
   const $container = document.createElement('div');
@@ -138,7 +135,7 @@ export function elementToScenes(el: Element): IDictionary<ISceneJSON> {
 export function elementToScene($scene: Element): ISceneJSON {
   return {
     states: sceneElementToStates($scene),
-    transitions: sceneElementToTransitions($scene),
+    transitions: sceneElementToTransitions($scene)
   };
 }
 
@@ -193,41 +190,37 @@ function sceneElementToTransitions($scene: Element): IDictionary<ITransitionJSON
 
 
 export function elementToState($state: Element): IStateJSON {
-  const targets: ITargetJSON[] = [];
 
   // read all "target" elements
   const $targets = selectAll($state, targetSelector);
+  const targets: ITargetJSON[] = [];
   for (let i = 0, len = $targets.length; i < len; i++) {
     // assemble target elements and properties and to the list
     const target = elementToTarget($targets[i]);
     targets.push(target);
   }
 
-  const defaultVal = $state.hasAttribute(defaultAttr);
-  const duration = convertToFloat(attr($state, durationAttr));
-  const easing = attr($state, easingAttr) || nil;
-  const transition = attr($state, transitionAttr) || nil;
-
-  const props: IDictionary<any> = {};
+  const props = {} as IStateJSON;
   const attributes = $state.attributes;
   for (let i = 0, len = attributes.length; i < len; i++) {
     // each attribute pair is a property and its value in the animation
     const att = attributes[i];
     const name = att.name;
-    if (statePropertyExclusions.indexOf(name) !== -1) {
+    if (name === nameAttr) {
       continue;
     }
-    props[name] = att.value;
+    if (name === durationAttr) {
+      props.duration = convertToFloat(attr($state, durationAttr));
+    } else if (name === defaultAttr) {
+      props.default = $state.hasAttribute(defaultAttr);
+    } else {
+      props[name] = att.value;
+    }
   }
 
-  return {
-    default: defaultVal,
-    duration,
-    easing,
-    targets,
-    transition,
-    props
-  };
+  props.targets = targets;
+
+  return props;
 };
 
 export function elementToTarget($target: Element): ITargetJSON {

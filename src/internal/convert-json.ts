@@ -23,14 +23,20 @@ export function fromScene(scene: IScene): ISceneJSON {
 }
 
 export function fromState(state: IState, isDefault: boolean): IStateJSON {
-  return {
+  const json: IStateJSON = {
     default: isDefault,
     duration: state.duration,
     easing: state.easing,
     targets: state.targets,
-    transition: nil,
-    props: state.props
+    transition: nil
   };
+
+  // copy properties onto the result;
+  for (let key in state.props) {
+    json[key] = state.props[key];
+  }
+
+  return json;
 }
 
 export function fromTransition(transition: ITransition, isDefault: boolean): ITransitionJSON  {

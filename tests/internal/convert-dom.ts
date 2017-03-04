@@ -36,25 +36,19 @@ describe('dom', () => {
           states: {
             C: {
               default: true,
-              duration: undefined,
-              easing: undefined,
               targets: [
                 { ref: '#box1', x: '0', y: '0', rotation: '0deg' },
                 { ref: '#box2', x: '0', y: '0', rotation: '0deg' }
               ],
-              transition: 'fast',
-              props: {}
+              transition: 'fast'
             },
             NE: {
-              default: false,
               duration: 1000,
               easing: 'Cubic.easeInOut',
               targets: [
                 { ref: '#box1', x: '100px', y: '-100px', rotation: '45deg' },
                 { ref: '#box2', x: '100px', y: '-100px', rotation: '45deg' }
-              ],
-              transition: undefined,
-              props: {}
+              ]
             }
           },
           transitions: {
@@ -120,25 +114,16 @@ describe('dom', () => {
         states: {
           first: {
             default: true,
-            duration: undefined,
-            easing: undefined,
             targets: [
               { ref: '#box1', x: '0' },
               { ref: '#box2', y: '0' }
-            ],
-            transition: undefined,
-            props: {}
+            ]
           },
           second: {
-            default: false,
-            duration: undefined,
-            easing: undefined,
             targets: [
               { ref: '#box1', x: '90px' },
               { ref: '#box2', y: '90px' }
-            ],
-            transition: undefined,
-            props: {}
+            ]
           }
         },
         transitions: {
@@ -172,9 +157,6 @@ describe('dom', () => {
 
       const state = elementToState($state);
       assert.deepEqual(state, {
-        default: false,
-        duration: undefined,
-        easing: undefined,
         targets: [
           {
             ref: '#box1',
@@ -185,11 +167,8 @@ describe('dom', () => {
             y: '0'
           }
         ],
-        transition: undefined,
-        props: {
-          x: '20px',
-          rotate: '10deg'
-        }
+        x: '20px',
+        rotate: '10deg'
       });
     });
   });

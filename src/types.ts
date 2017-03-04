@@ -63,7 +63,7 @@ export interface IStateJSON {
   easing?: string | undefined;
   transition?: string | undefined;
   targets: ITargetJSON[];
-  props: IDictionary<boolean | number | string | ITargetJSON[] | undefined>;
+  [name: string]: boolean | number | string | ITargetJSON[] | undefined;
 }
 
 export interface ITransitionJSON {

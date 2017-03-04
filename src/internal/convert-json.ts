@@ -1,4 +1,4 @@
-import { IScene, ISceneJSON, IState, IStateJSON, ITransition, ITransitionJSON } from '../types';
+import { IDictionary, IScene, ISceneJSON, IState, IStateJSON, ITransition, ITransitionJSON } from '../types';
 import { missingArg, nil } from '../internal';
 
 export function fromScene(scene: IScene): ISceneJSON {
@@ -28,6 +28,7 @@ export function fromState(state: IState, isDefault: boolean): IStateJSON {
     duration: state.duration,
     easing: state.easing,
     targets: state.targets,
+    name: state.name,
     transition: nil
   };
 
@@ -87,13 +88,24 @@ export function toScene(sceneJSON: ISceneJSON): IScene {
   };
 }
 
+const stateProps = ['duration', 'easing', 'name', 'targets', 'transition'];
 export function toState(stateName: string, stateJSON: IStateJSON): IState {
+  const props: IDictionary<any> = {};
+
+  for (let propName in stateJSON) {
+    if (stateProps.indexOf(propName) !== -1) {
+      continue;
+    }
+    props[propName] = stateJSON[propName];
+  }
+
   return <IState> {
     duration: stateJSON.duration,
     easing: stateJSON.easing,
     name: stateName,
     targets: stateJSON.targets,
-    transition: nil
+    transition: nil,
+    props
   };
 }
 

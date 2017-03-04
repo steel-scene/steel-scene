@@ -26,6 +26,8 @@ const defaultAttr = 'default';
 const transitionAttr = 'transition';
 const defaultName = '_';
 
+const statePropertyExclusions: string[] = [nameAttr, durationAttr, defaultAttr, easingAttr, transitionAttr];
+
 export function scenesToElement(scenes: IDictionary<ISceneJSON>): Element {
   const $container = document.createElement('div');
   for (const layerName in scenes) {
@@ -103,7 +105,11 @@ export function stateToElement(stateName: string, state: IStateJSON): Element {
 export function targetToElement(target: ITargetJSON): Element {
   const $target = document.createElement(targetSelector);
   for (let propName in target) {
-    $target.setAttribute(propName, target[propName]);
+    const val = target[propName];
+    if (val === nil) {
+      continue;
+    }
+    $target.setAttribute(propName, val.toString());
   }
   return $target;
 }
@@ -185,6 +191,7 @@ function sceneElementToTransitions($scene: Element): IDictionary<ITransitionJSON
   return transitions;
 }
 
+
 export function elementToState($state: Element): IStateJSON {
   const targets: ITargetJSON[] = [];
 
@@ -201,12 +208,25 @@ export function elementToState($state: Element): IStateJSON {
   const easing = attr($state, easingAttr) || nil;
   const transition = attr($state, transitionAttr) || nil;
 
+  const props: IDictionary<any> = {};
+  const attributes = $state.attributes;
+  for (let i = 0, len = attributes.length; i < len; i++) {
+    // each attribute pair is a property and its value in the animation
+    const att = attributes[i];
+    const name = att.name;
+    if (statePropertyExclusions.indexOf(name) !== -1) {
+      continue;
+    }
+    props[name] = att.value;
+  }
+
   return {
     default: defaultVal,
     duration,
     easing,
     targets,
-    transition
+    transition,
+    props
   };
 };
 

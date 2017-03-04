@@ -28,7 +28,8 @@ export function fromState(state: IState, isDefault: boolean): IStateJSON {
     duration: state.duration,
     easing: state.easing,
     targets: state.targets,
-    transition: nil
+    transition: nil,
+    props: state.props
   };
 }
 
@@ -81,7 +82,7 @@ export function toScene(sceneJSON: ISceneJSON): IScene {
 }
 
 export function toState(stateName: string, stateJSON: IStateJSON): IState {
-  return {
+  return <IState> {
     duration: stateJSON.duration,
     easing: stateJSON.easing,
     name: stateName,

@@ -38,6 +38,7 @@ export interface IState {
   name: string;
   targets: ITarget[];
   transition: ITransition | undefined;
+  props: IDictionary<any>;
 }
 
 export interface ITransition {
@@ -60,8 +61,9 @@ export interface IStateJSON {
   default?: boolean | undefined;
   duration?: number | undefined;
   easing?: string | undefined;
-  targets: ITargetJSON[];
   transition?: string | undefined;
+  targets: ITargetJSON[];
+  props: IDictionary<boolean | number | string | ITargetJSON[] | undefined>;
 }
 
 export interface ITransitionJSON {
@@ -72,5 +74,5 @@ export interface ITransitionJSON {
 
 export interface ITargetJSON {
   ref: string;
-  [name: string]: string;
+  [name: string]: string | number;
 }

@@ -42,7 +42,8 @@ describe('dom', () => {
                 { ref: '#box1', x: '0', y: '0', rotation: '0deg' },
                 { ref: '#box2', x: '0', y: '0', rotation: '0deg' }
               ],
-              transition: 'fast'
+              transition: 'fast',
+              props: {}
             },
             NE: {
               default: false,
@@ -52,7 +53,8 @@ describe('dom', () => {
                 { ref: '#box1', x: '100px', y: '-100px', rotation: '45deg' },
                 { ref: '#box2', x: '100px', y: '-100px', rotation: '45deg' }
               ],
-              transition: undefined
+              transition: undefined,
+              props: {}
             }
           },
           transitions: {
@@ -124,7 +126,8 @@ describe('dom', () => {
               { ref: '#box1', x: '0' },
               { ref: '#box2', y: '0' }
             ],
-            transition: undefined
+            transition: undefined,
+            props: {}
           },
           second: {
             default: false,
@@ -134,7 +137,8 @@ describe('dom', () => {
               { ref: '#box1', x: '90px' },
               { ref: '#box2', y: '90px' }
             ],
-            transition: undefined
+            transition: undefined,
+            props: {}
           }
         },
         transitions: {
@@ -161,6 +165,8 @@ describe('dom', () => {
 
       const $state = document.createElement('s-state');
       $state.setAttribute('name', 'first');
+      $state.setAttribute('x', '20px');
+      $state.setAttribute('rotate', '10deg');
       $state.appendChild($target1);
       $state.appendChild($target2);
 
@@ -179,7 +185,11 @@ describe('dom', () => {
             y: '0'
           }
         ],
-        transition: undefined
+        transition: undefined,
+        props: {
+          x: '20px',
+          rotate: '10deg'
+        }
       });
     });
   });

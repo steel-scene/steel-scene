@@ -13,15 +13,21 @@ export interface ISteelScene {
 }
 
 export interface IAnimationEngine {
-  set(toState: IState): void;
-  transition(transitions: IEngineTransition[], onStateChange: (stateName: string) => void): void;
+  set(to: ISetOperation[]): void;
+  transition(to: ITweenOperation[][], onStateChange: (stateName: string) => void): void;
 }
 
-export interface IEngineTransition {
-  duration: number;
+export interface ISetOperation {
+  targets: string;
+  set: IDictionary<any>;
+}
+
+export interface ITweenOperation {
+  targets: string;
+  duration: number | undefined;
   easing: string | undefined;
-  fromState: IState;
-  toState: IState;
+  name: string;
+  keyframes: IDictionary<any>[];
 }
 
 export interface IScene {
@@ -41,6 +47,7 @@ export interface IState {
   props: IDictionary<any>;
 }
 
+
 export interface ITransition {
   duration: number | undefined;
   easing: string | undefined;
@@ -49,7 +56,7 @@ export interface ITransition {
 
 export interface ITarget {
   ref: string;
-  [name: string]: string;
+  [name: string]: string | number;
 }
 
 export interface ISceneJSON {

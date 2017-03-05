@@ -1,7 +1,6 @@
-import { nil } from '../internal';
+import { _ } from './resources';
 
 const unitExpression = /^([+-][=]){0,1}[ ]*([\-]{0,1}[0-9]*[\.]{0,1}[0-9]*){0,1}[ ]*(to){0,1}[ ]*([\-]{0,1}[0-9]*[\.]{0,1}[0-9]*)[ ]*([a-z%]+){0,1}[ ]*$/i;
-
 const measureExpression = /^[ ]*([\-]{0,1}[0-9]*[\.]{0,1}[0-9]*){1}[ ]*([a-z%]+){0,1}$/i;
 
 // export const stepNone: string = '=';
@@ -14,10 +13,10 @@ export const stepBackward: string = '-=';
  */
 export function createUnitResolver(val: string | number): UnitResolver {
   if (!val && val !== 0) {
-    return () => ({ unit: nil, value: 0 });
+    return () => ({ unit: _, value: 0 });
   }
   if (typeof val === 'number') {
-    return () => ({ unit: nil, value: val as number });
+    return () => ({ unit: _, value: val as number });
   }
 
   const match = unitExpression.exec(val as string) as RegExpExecArray;
@@ -27,8 +26,8 @@ export function createUnitResolver(val: string | number): UnitResolver {
   const endValueString = match[4];
   const unitTypeString = match[5];
 
-  const startCo = startString ? parseFloat(startString) : nil;
-  const endCo = endValueString ? parseFloat(endValueString) : nil;
+  const startCo = startString ? parseFloat(startString) : _;
+  const endCo = endValueString ? parseFloat(endValueString) : _;
   const sign = stepTypeString === stepBackward ? -1 : 1;
   const isIndexed = !!stepTypeString;
   const isRange = toOperator === 'to';
@@ -40,7 +39,7 @@ export function createUnitResolver(val: string | number): UnitResolver {
       : startCo! * index2 * sign;
 
     return {
-      unit: unitTypeString || nil,
+      unit: unitTypeString || _,
       value: value
     };
   };
@@ -55,18 +54,18 @@ export function parseUnit(val: string | number | undefined, output?: Unit): Unit
   output = output || {} as Unit;
 
   if (!val && val !== 0) {
-    output.unit = nil;
-    output.value = nil;
+    output.unit = _;
+    output.value = _;
   } else if (typeof val === 'number') {
-    output.unit = nil;
+    output.unit = _;
     output.value = val as number;
   } else {
     const match = measureExpression.exec(val as string) as RegExpExecArray;
     const startString = match[1];
     const unitTypeString = match[2];
 
-    output.unit = unitTypeString || nil;
-    output.value = startString ? parseFloat(startString) : nil;
+    output.unit = unitTypeString || _;
+    output.value = startString ? parseFloat(startString) : _;
   }
 
   return output;

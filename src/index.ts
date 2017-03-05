@@ -1,5 +1,6 @@
 import { SteelScene } from './internal';
 import { IAnimationEngine, ISceneJSON, IDictionary } from './types';
+import * as types from './types';
 
 // initialize default instance
 const bu = new SteelScene();
@@ -21,7 +22,6 @@ export const use = bu.use as { (a: IAnimationEngine): SteelScene };
 /**
  * Export all types to "types"
  */
-import * as types from './types';
 export { types };
 
 // auto-wire up document on DOMContentLoaded

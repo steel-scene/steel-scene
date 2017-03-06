@@ -1,5 +1,5 @@
 import {
-  IDictionary,
+  Dictionary,
   ISceneJSON,
   IStateJSON,
   ITargetJSON,
@@ -7,11 +7,15 @@ import {
 } from '../types';
 
 import {
-  attr,
+  getAttribute,
   convertToFloat,
   missingArg,
   _,
-  $
+  findElements,
+  createElement,
+  setAttribute,
+  appendElement,
+  copyArray
 } from '../utils';
 
 const sceneSelector = 's-scene';
@@ -25,25 +29,24 @@ const easingAttr = 'easing';
 const defaultAttr = 'default';
 const defaultName = '_';
 
-export function scenesToElement(scenes: IDictionary<ISceneJSON>): Element {
-  const $container = document.createElement('div');
+export function scenesToElement(scenes: Dictionary<ISceneJSON>): Element {
+  const $container = createElement('div');
   for (const layerName in scenes) {
     const $scene = sceneToElement(scenes[layerName]);
-    $scene.setAttribute(nameAttr, layerName);
-    $container.appendChild($scene);
+    setAttribute($scene, nameAttr, layerName);
+    appendElement($container, $scene);
   }
   return $container;
 }
 
 export function sceneToElement(scene: ISceneJSON): Element {
-  const $scene = document.createElement(sceneSelector);
+  const $scene = createElement(sceneSelector);
 
   const states = scene.states;
   for (let stateName in states) {
-    const state = states[stateName];
-    const $state = stateToElement(state);
-    $state.setAttribute(nameAttr, stateName);
-    $scene.appendChild($state);
+    const $state = stateToElement(states[stateName]);
+    setAttribute($state, nameAttr, stateName);
+    appendElement($scene, $state);
   }
 
   const transitions = scene.transitions;
@@ -51,12 +54,12 @@ export function sceneToElement(scene: ISceneJSON): Element {
     const transition = transitions[transitionName];
     const $transition = transitionToElement(transition);
     if (transitionName && transitionName !== defaultName) {
-      $transition.setAttribute(nameAttr, transitionName);
+      setAttribute($transition, nameAttr, transitionName);
     }
     if (transition.default) {
-      $transition.setAttribute(defaultAttr, '');
+      setAttribute($transition, defaultAttr, '');
     }
-    $scene.appendChild($transition);
+    appendElement($scene, $transition);
   }
 
   return $scene;
@@ -67,73 +70,63 @@ export function isElementDefault(element: Element): boolean {
 }
 
 export function transitionToElement(transition: ITransitionJSON): Element {
-  const $transition = document.createElement(transitionSelector);
+  const $transition = createElement(transitionSelector);
   if (transition.duration) {
-    $transition.setAttribute(durationAttr, transition.duration.toString());
+    setAttribute($transition, durationAttr, transition.duration.toString());
   }
   if (transition.easing) {
-    $transition.setAttribute(easingAttr, transition.easing);
+    setAttribute($transition, easingAttr, transition.easing);
   }
   if (transition.default) {
-    $transition.setAttribute(defaultAttr, '');
+    setAttribute($transition, defaultAttr, '');
   }
   return $transition;
 }
 
 export function stateToElement(state: IStateJSON): Element {
-  const $state = document.createElement(stateSelector);
+  const $state = createElement(stateSelector);
 
   if (state.default) {
-    $state.setAttribute(defaultAttr, '');
+    setAttribute($state, defaultAttr, '');
   }
   if (state.duration) {
-    $state.setAttribute(durationAttr, state.duration.toString());
+    setAttribute($state, durationAttr, state.duration.toString());
   }
   if (state.easing) {
-    $state.setAttribute(easingAttr, state.easing);
+    setAttribute($state, easingAttr, state.easing);
   }
   if (state.transition) {
-    $state.setAttribute(easingAttr, state.transition);
+    setAttribute($state, easingAttr, state.transition);
   }
 
-  const targets = state.targets;
-  for (let i = 0, len = targets.length; i < len; i++) {
-    $state.appendChild(targetToElement(targets[i]));
-  }
-
+  state.targets.forEach(t => appendElement($state, targetToElement(t)))
   return $state;
 }
 
 export function targetToElement(target: ITargetJSON): Element {
-  const $target = document.createElement(targetSelector);
+  const $target = createElement(targetSelector);
   for (let propName in target) {
     const val = target[propName];
     if (val === _) {
       continue;
     }
-    $target.setAttribute(propName, val.toString());
+    setAttribute($target, propName, val.toString());
   }
   return $target;
 }
 
-export function elementToScenes(el: Element): IDictionary<ISceneJSON> {
+export function elementToScenes(el: Element): Dictionary<ISceneJSON> {
   // find all layer elemenets
-  const $scenes = $(sceneSelector, el);
-
-  // assemble a JSON object for each layer and return as a dictionary
-  const scenes: IDictionary<ISceneJSON> = {};
-  for (let i = 0, len = $scenes.length; i < len; i++) {
-    const $scene = $scenes[i] as Element;
-
+  const scenes: Dictionary<ISceneJSON> = {};
+  findElements(sceneSelector, el).forEach($scene => {
     // get the bane if the layer
-    const sceneName = attr($scene, nameAttr);
+    const sceneName = getAttribute($scene, nameAttr);
     if (!sceneName) {
       throw missingArg(nameAttr);
     }
-
     // read element to pull in the layer definition
     scenes[sceneName] = elementToScene($scene);
-  }
+  });
   return scenes;
 }
 
@@ -144,86 +137,70 @@ export function elementToScene($scene: Element): ISceneJSON {
   };
 }
 
-function sceneElementToStates($scene: Element): IDictionary<IStateJSON> {
+function sceneElementToStates($scene: Element): Dictionary<IStateJSON> {
   // find all "state" elements
-  const states: IDictionary<IStateJSON> = {};
+  const states: Dictionary<IStateJSON> = {};
 
   // assemble all states (nodes)... each ref refers to an element and its
   // properties instruct the animation engine what propertie to set
-  const $states = $(stateSelector, $scene);
-  for (let i = 0, len = $states.length; i < len; i++) {
-    const $state = $states[i] as Element;
-
+  findElements(stateSelector, $scene).forEach($state => {
     // read element to pull in state definiton
     const state = elementToState($state);
-    const stateName = attr($state, nameAttr) || (state.default ? defaultName : _);
+    const stateName = getAttribute($state, nameAttr) || (state.default ? defaultName : _);
 
     // skip if no name present and not marked default
     if (!stateName) {
-      continue;
+      return;
     }
 
     states[stateName] = state;
-  }
+  });
 
   return states;
 }
 
-function sceneElementToTransitions($scene: Element): IDictionary<ITransitionJSON> {
+function sceneElementToTransitions($scene: Element): Dictionary<ITransitionJSON> {
   // assemble all transitions (the edges between nodes)
-  const transitions: IDictionary<ITransitionJSON> = {};
+  const transitions: Dictionary<ITransitionJSON> = {};
 
   // find all "transition" elements
-  const $transitions = $(transitionSelector, $scene);
-  for (let i = 0, len = $transitions.length; i < len; i++) {
-    // assemble transitions and add to the list
-    const $transition = $transitions[i];
+  findElements(transitionSelector, $scene).forEach($transition => {
     const transition = elementToTransition($transition as Element);
-    const name = attr($transition as Element, nameAttr) || (transition.default ? defaultName : _);
+    const name = getAttribute($transition as Element, nameAttr) || (transition.default ? defaultName : _);
 
     // skip if no name present and not marked default
     if (!name) {
-      continue;
+      return;
     }
 
     // add to list, merge if duplicate
     transitions[name] = transition;
-  }
+  });
 
   return transitions;
 }
 
-
 export function elementToState($state: Element): IStateJSON {
 
   // read all "target" elements
-  const $targets = $(targetSelector, $state);
-  const targets: ITargetJSON[] = [];
-  for (let i = 0, len = $targets.length; i < len; i++) {
-    // assemble target elements and properties and to the list
-    const target = elementToTarget($targets[i]);
-    targets.push(target);
-  }
+  // assemble target elements and properties and to the list
+  const props: IStateJSON = {
+    targets: findElements(targetSelector, $state).map(elementToTarget)
+  };
 
-  const props = {} as IStateJSON;
-  const attributes = $state.attributes;
-  for (let i = 0, len = attributes.length; i < len; i++) {
-    // each attribute pair is a property and its value in the animation
-    const att = attributes[i];
-    const name = att.name;
-    if (name === nameAttr) {
-      continue;
-    }
-    if (name === durationAttr) {
-      props.duration = convertToFloat(attr($state, durationAttr));
-    } else if (name === defaultAttr) {
-      props.default = $state.hasAttribute(defaultAttr);
-    } else {
-      props[name] = att.value;
-    }
-  }
-
-  props.targets = targets;
+  copyArray($state.attributes)
+    .forEach(att => {
+      const name = att.name;
+      if (name === nameAttr) {
+        // do nothing
+      } else if (name === durationAttr) {
+        props.duration = convertToFloat(getAttribute($state, durationAttr));
+      } else if (name === defaultAttr) {
+        props.default = true;
+      } else {
+        props[name] = att.value;
+      }
+    });
 
   return props;
 };
@@ -231,13 +208,10 @@ export function elementToState($state: Element): IStateJSON {
 export function elementToTarget($target: Node): ITargetJSON {
   const target = {} as ITargetJSON;
 
-  // read all attribute pairs into a regular dictionaryh
-  const attributes = $target.attributes;
-  for (let i = 0, len = attributes.length; i < len; i++) {
-    // each attribute pair is a property and its value in the animation
-    const att = attributes[i];
+  // read all attribute pairs into a regular dictionary
+  copyArray($target.attributes).forEach(att => {
     target[att.name] = att.value;
-  }
+  });
 
   // a referring element is required
   if (!target.ref) {
@@ -248,16 +222,9 @@ export function elementToTarget($target: Node): ITargetJSON {
 }
 
 export function elementToTransition($transition: Element): ITransitionJSON {
-  const defaultVal = $transition.hasAttribute(defaultAttr);
-  const duration = convertToFloat(attr($transition, durationAttr));
-
-  // grab easing definition (the animation engine will interpret this, so no parsing possible)
-  const easing = attr($transition, easingAttr) || _;
-
-  // return transition
   return {
-    default: defaultVal,
-    duration,
-    easing
+    default: $transition.hasAttribute(defaultAttr),
+    duration: convertToFloat(getAttribute($transition, durationAttr)),
+    easing: getAttribute($transition, easingAttr) || _
   };
 }

@@ -1,7 +1,7 @@
 import {
   IAnimationEngine,
   ISteelScene,
-  IDictionary,
+  Dictionary,
   ISceneJSON
 } from '../types';
 
@@ -18,15 +18,13 @@ import {
 
 export class SteelScene implements ISteelScene {
   private _engine: IAnimationEngine;
-  private _scenes: IDictionary<Scene> = {};
+  private _scenes: Dictionary<Scene> = {};
 
   public exportHTML = (): Element => {
-    const self = this;
-    const json = self.exportJSON();
-    return scenesToElement(json);
+    return scenesToElement(this.exportJSON());
   }
 
-  public exportJSON = (): IDictionary<ISceneJSON> => {
+  public exportJSON = (): Dictionary<ISceneJSON> => {
     return mapProperties(this._scenes, (key, value) => value.toJSON())
   }
 
@@ -48,14 +46,18 @@ export class SteelScene implements ISteelScene {
   /**
    * Import scenes from JSON
    */
-  public importJSON = (scenes: IDictionary<ISceneJSON>, reset: boolean = true): this => {
+  public importJSON = (scenes: Dictionary<ISceneJSON>, reset: boolean = true): this => {
     const self = this;
-    for (let sceneName in scenes) {
-      self._scenes[sceneName] =  new Scene(self._engine).fromJSON(scenes[sceneName]);
-    }
+
+    self._scenes = mapProperties(
+      scenes,
+      (key, value) => new Scene(self._engine).fromJSON(value)
+    );
+
     if (reset) {
       self.reset();
     }
+
     return self;
   }
 
@@ -76,9 +78,7 @@ export class SteelScene implements ISteelScene {
    */
   public set = (sceneName: string, toStateName: string): this => {
     const self = this;
-    // lookup scene and state
-    const scene = self._scenes[sceneName];
-    scene.set(toStateName);
+    self._scenes[sceneName].set(toStateName);
     return self;
   }
 
@@ -87,8 +87,7 @@ export class SteelScene implements ISteelScene {
    */
   public transition = (sceneName: string, ...states: string[]): this => {
     const self = this;
-    const scene = self._scenes[sceneName];
-    scene.transition(...states);
+    self._scenes[sceneName].transition(states);
     return self;
   }
 
@@ -97,7 +96,6 @@ export class SteelScene implements ISteelScene {
    */
   public use = (animationEngine: IAnimationEngine): this => {
     const self = this;
-    // set new animation engine
     self._engine = animationEngine;
     return self;
   }

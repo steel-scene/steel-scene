@@ -1,4 +1,4 @@
-import { IDictionary, IStateJSON, ITarget } from '../types';
+import { Dictionary, IStateJSON, ITarget } from '../types';
 import { elementToState } from '../internal';
 import { assignExcept, resolveElement } from '../utils';
 
@@ -7,7 +7,7 @@ export class State {
   public transition: string | undefined;
   public easing: string | undefined;
   public targets: ITarget[];
-  public props: IDictionary<any>;
+  public props: Dictionary<any>;
 
   public fromJSON(json: IStateJSON): this {
     const self = this;

@@ -1,4 +1,4 @@
-import { IDictionary } from '../types';
+import { Dictionary } from '../types';
 import { _ } from './resources';
 
 const assignInner = (target: {}, args: IArguments, exclusions?: string[]): {} => {
@@ -26,8 +26,8 @@ const assignInner = (target: {}, args: IArguments, exclusions?: string[]): {} =>
   return target;
 };
 
-export const mapProperties = <TInput, TOutput>(input: IDictionary<TInput>, mapper: (key: string, val: TInput) => TOutput): IDictionary<TOutput> => {
-  const output: IDictionary<TOutput> = {};
+export const mapProperties = <TInput, TOutput>(input: Dictionary<TInput>, mapper: (key: string, val: TInput) => TOutput): Dictionary<TOutput> => {
+  const output: Dictionary<TOutput> = {};
   for (const key in input) {
     if (!input.hasOwnProperty(key)) {
       continue;
@@ -49,7 +49,7 @@ export const assignExcept = function (target: {}, source: {}, exclusions: string
   return assignInner(target, arguments, exclusions);
 };
 
-export function propertyHead<T>(dictionary: IDictionary<T>, predicate: { (t: T): boolean; }): T | undefined {
+export function propertyHead<T>(dictionary: Dictionary<T>, predicate: { (t: T): boolean; }): T | undefined {
   if (!dictionary) {
     return _;
   }

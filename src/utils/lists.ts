@@ -1,7 +1,7 @@
-import { IList } from '../types';
+import { List, Predicate } from '../types';
 import { _ } from './resources';
 
-export function head<T>(indexed: IList<T>, predicate: { (t: T): boolean; }): T | undefined {
+export const head = <T>(indexed: List<T>, predicate: Predicate<T>): T | undefined => {
   if (!indexed) {
     return _;
   }
@@ -13,4 +13,26 @@ export function head<T>(indexed: IList<T>, predicate: { (t: T): boolean; }): T |
     }
   }
   return _;
-}
+};
+
+export const copyArray = <T>(items: List<T>): T[] => {
+  return Array.prototype.slice.call(items);
+};
+
+/**
+ * Map function that skips undefined results
+ */
+export const mapf = <TInput, TOutput>(items: List<TInput>, mapper: { (input: TInput, index?: number): TOutput | undefined }): TOutput[] => {
+  let output: TOutput[] | undefined = _;
+  for (let i = 0, len = items.length; i < len; i++) {
+    const result = mapper(items[i], i);
+    if (result === _) {
+      continue;
+    }
+    if (output === _) {
+      output = [];
+    }
+    output.push(result);
+  }
+  return output || [];
+};

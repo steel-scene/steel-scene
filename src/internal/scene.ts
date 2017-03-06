@@ -2,11 +2,11 @@ import { State } from './state';
 import { Transition } from './transition';
 import { elementToScene } from './convert-dom';
 import { _, missingArg, resolveElement, assign, assignExcept, mapProperties } from '../utils';
-import { IAnimationEngine, IDictionary, ISceneJSON, ISetOperation, ITarget, ITweenOperation } from '../types';
+import { IAnimationEngine, Dictionary, ISceneJSON, ISetOperation, ITarget, ITweenOperation } from '../types';
 
 export class Scene {
-  private states: IDictionary<State>;
-  private transitions: IDictionary<Transition>;
+  private states: Dictionary<State>;
+  private transitions: Dictionary<Transition>;
 
   private defaultTransition: string | undefined;
   private defaultState: string;
@@ -22,26 +22,21 @@ export class Scene {
     const transitions = {};
     for (let transitionName in json.transitions) {
       const transitionJSON = json.transitions[transitionName];
-      const transition = new Transition().fromJSON(transitionJSON);
       if (transitionJSON.default) {
         defaultTransition = transitionName;
       }
-      transitions[transitionName] = transition;
+      transitions[transitionName] = new Transition().fromJSON(transitionJSON);
     }
-    self.defaultTransition = defaultTransition;
-    self.transitions = transitions;
 
     // load states into scene
     let defaultState: string | undefined;
     const states = {};
     for (let stateName in json.states) {
       const stateJSON = json.states[stateName];
-      const state = new State().fromJSON(stateJSON);
-
       if (stateJSON.default) {
         defaultState = stateName;
       }
-      states[stateName] = state;
+      states[stateName] = new State().fromJSON(stateJSON);
     }
 
     // a starting point is required
@@ -49,6 +44,8 @@ export class Scene {
       throw missingArg('default state');
     }
 
+    self.defaultTransition = defaultTransition;
+    self.transitions = transitions;
     self.defaultState = defaultState;
     self.currentState = defaultState;
     self.states = states;
@@ -64,36 +61,32 @@ export class Scene {
   }
 
   public reset(): this {
-    const self = this;
-    return self.set(self.defaultState);
+    return this.set(this.defaultState);
   }
 
   public set(toStateName: string): this {
     const self = this;
     const toState = self.states[toStateName];
 
-    const operations = toState.targets
-      .map((t: ITarget): ISetOperation => ({
-        targets: t.ref,
-        set: assignExcept({}, assign({}, toState.props, t), ['ref'])
-      }));
-
     // tell animation engine to set the state directly
-    self.engine.set(operations);
+    self.engine.set(
+      toState.targets
+        .map((t: ITarget): ISetOperation => ({
+          targets: t.ref,
+          set: assignExcept({}, assign({}, toState.props, t), ['ref'])
+        }))
+    );
+
     self.currentState = toStateName;
     return self;
   }
 
-  public transition(...states: string[]): this {
+  public transition(states: string[]): this {
     const self = this;
 
     // find a suitable transition between the states
-    let fromStateName =  self.currentState;
-
-    const engineTransitions: ITweenOperation[][] = [];
-
-    for (let x = 0, xlen = states.length; x < xlen; x++) {
-      const toStateName = states[x];
+    let fromStateName = self.currentState;
+    const stateTransfomer = (toStateName: string) => {
       const fromState = self.states[fromStateName];
       const toState = self.states[toStateName];
       const transitions = self.transitions;
@@ -123,28 +116,22 @@ export class Scene {
       const targets = {};
 
       // group from props by target
-      for (let i = 0, len = fromState.targets.length; i < len; i++) {
-        const target = fromState.targets[i];
-        const allProps = assign({}, fromState.props, target);
-        const ref = target.ref;
-        let tween = targets[ref];
+      fromState.targets.forEach(target => {
+        let tween = targets[target.ref];
         if (!tween) {
-          targets[ref] = tween = [];
+          targets[target.ref] = tween = [];
         }
-        tween.push(assignExcept({}, allProps, ['ref']));
-      }
+        tween.push(assignExcept({}, assign({}, fromState.props, target), ['ref']));
+      });
 
       // group to props by target
-      for (let i = 0, len = toState.targets.length; i < len; i++) {
-        const target = toState.targets[i];
-        const allProps = assign({}, toState.props, target);
-        const ref = target.ref;
-        let tween = targets[ref];
+      toState.targets.forEach(target => {
+        let tween = targets[target.ref];
         if (!tween) {
-          targets[ref] = tween = [];
+          targets[target.ref] = tween = [];
         }
-        tween.push(assignExcept({}, allProps, ['ref']));
-      }
+        tween.push(assignExcept({}, assign({}, toState.props, target), ['ref']));
+      });
 
       // convert grouping to array of tween operations
       const tweenOptions: ITweenOperation[] = [];
@@ -158,13 +145,17 @@ export class Scene {
         });
       }
 
-      engineTransitions.push(tweenOptions);
       fromStateName = toStateName;
-    }
+      return tweenOptions;
+    };
 
     // tell animation engine to transition
     // need some work on this, possible that this would be called repeatedly
-    self.engine.transition(engineTransitions, (stateName: string) => self.currentState = stateName);
+    self.engine.transition(
+      states.map(stateTransfomer),
+      (stateName: string) => self.currentState = stateName
+    );
+
     return self;
   }
 

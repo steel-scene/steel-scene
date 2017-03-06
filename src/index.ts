@@ -1,5 +1,5 @@
 import { SteelScene } from './internal';
-import { IAnimationEngine, ISceneJSON, IDictionary } from './types';
+import { IAnimationEngine, ISceneJSON, Dictionary } from './types';
 import * as types from './types';
 
 // initialize default instance
@@ -16,7 +16,7 @@ export const {
 } = bu;
 
 // export directly because of typing visibility
-export const importJSON = bu.importJSON as { (scenes: IDictionary<ISceneJSON>, reset: boolean): SteelScene };
+export const importJSON = bu.importJSON as { (scenes: Dictionary<ISceneJSON>, reset: boolean): SteelScene };
 export const use = bu.use as { (a: IAnimationEngine): SteelScene };
 
 /**

@@ -1,4 +1,4 @@
-import { parseUnit, createUnitResolver } from '../../src/internal/units';
+import { parseUnit, createUnitResolver } from '../../src/utils';
 
 import * as assert from 'assert';
 import { almostEqual } from '../assertions';

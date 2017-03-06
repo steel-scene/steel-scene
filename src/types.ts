@@ -35,7 +35,7 @@ export interface ISteelScene {
 // plugin types
 export interface IAnimationEngine {
   set(to: ISetOperation[]): void;
-  transition(to: ITweenOperation[][], onStateChange: (stateName: string) => void): void;
+  transition(to: ITimelineTween, onStateChange: (stateName: string) => void): void;
 }
 
 export interface ISetOperation {
@@ -43,14 +43,22 @@ export interface ISetOperation {
   set: Dictionary<any>;
 }
 
-export interface ITweenOperation {
-  targets: string;
-  duration: number | undefined;
-  easing: string | undefined;
-  name: string;
-  keyframes: Dictionary<any>[];
+export interface ITimelineTween {
+  id: number;
+  states: IStateTween[]
 }
 
+export interface IStateTween {
+  stateName: string;
+  tweens: ITargetTween[];
+  duration: number;
+  easing: string | undefined;
+}
+
+export interface ITargetTween {
+  targets: string;
+  keyframes: Dictionary<any>[];
+}
 
 // export interface IScene {
 //   defaultTransition?: ITransition;

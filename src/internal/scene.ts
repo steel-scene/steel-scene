@@ -2,7 +2,9 @@ import { State } from './state';
 import { Transition } from './transition';
 import { elementToScene } from './convert-dom';
 import { _, missingArg, resolveElement, assign, assignExcept, mapProperties } from '../utils';
-import { IAnimationEngine, Dictionary, ISceneJSON, ISetOperation, ITarget, ITweenOperation } from '../types';
+import { IAnimationEngine, Dictionary, ISceneJSON, ISetOperation, ITarget, ITimelineTween, IStateTween, ITargetTween } from '../types';
+
+let globalId = 0;
 
 export class Scene {
   private states: Dictionary<State>;
@@ -11,6 +13,7 @@ export class Scene {
   private defaultTransition: string | undefined;
   private defaultState: string;
   private currentState: string;
+  private id: number = ++globalId;
 
   constructor(private engine: IAnimationEngine) { }
 
@@ -86,7 +89,7 @@ export class Scene {
 
     // find a suitable transition between the states
     let fromStateName = self.currentState;
-    const stateTransfomer = (toStateName: string) => {
+    const stateTransfomer = (toStateName: string): IStateTween => {
       const fromState = self.states[fromStateName];
       const toState = self.states[toStateName];
       const transitions = self.transitions;
@@ -134,25 +137,33 @@ export class Scene {
       });
 
       // convert grouping to array of tween operations
-      const tweenOptions: ITweenOperation[] = [];
+      const tweenOptions: ITargetTween[] = [];
+
       for (const ref in targets) {
         tweenOptions.push({
           targets: ref,
-          keyframes: targets[ref],
-          easing,
-          duration,
-          name: toStateName
+          keyframes: targets[ref]
         });
       }
 
       fromStateName = toStateName;
-      return tweenOptions;
+      return {
+        tweens: tweenOptions,
+        stateName: toStateName,
+        duration,
+        easing
+      };
+    };
+
+    const timelineTween: ITimelineTween = {
+      id: this.id,
+      states: states.map(stateTransfomer)
     };
 
     // tell animation engine to transition
     // need some work on this, possible that this would be called repeatedly
     self.engine.transition(
-      states.map(stateTransfomer),
+      timelineTween,
       (stateName: string) => self.currentState = stateName
     );
 

@@ -1,4 +1,5 @@
 import { _ } from './resources';
+import { isNumber } from './objects';
 
 const unitExpression = /^([+-][=]){0,1}[ ]*([\-]{0,1}[0-9]*[\.]{0,1}[0-9]*){0,1}[ ]*(to){0,1}[ ]*([\-]{0,1}[0-9]*[\.]{0,1}[0-9]*)[ ]*([a-z%]+){0,1}[ ]*$/i;
 const measureExpression = /^[ ]*([\-]{0,1}[0-9]*[\.]{0,1}[0-9]*){1}[ ]*([a-z%]+){0,1}$/i;
@@ -7,15 +8,23 @@ const measureExpression = /^[ ]*([\-]{0,1}[0-9]*[\.]{0,1}[0-9]*){1}[ ]*([a-z%]+)
 export const stepForward: string = '+=';
 export const stepBackward: string = '-=';
 
+export const random = (first: number, last: number, unit?: string, wholeNumbersOnly?: boolean): number | string => {
+  let val = first + (Math.random() * (last - first));
+  if (wholeNumbersOnly === true) {
+    val = Math.floor(val);
+  }
+  return !unit ? val : val + unit;
+}
+
 /**
  * Returns a unit resolver.  The unit resolver returns what the unit should be
  * at a given index.  for instance +=200 should be 200 at 0, 400 at 1, and 600 at 2
  */
-export function createUnitResolver(val: string | number): UnitResolver {
+export const createUnitResolver = (val: string | number): UnitResolver => {
   if (!val && val !== 0) {
     return () => ({ unit: _, value: 0 });
   }
-  if (typeof val === 'number') {
+  if (isNumber(val)) {
     return () => ({ unit: _, value: val as number });
   }
 
@@ -50,13 +59,13 @@ export function createUnitResolver(val: string | number): UnitResolver {
 /**
  * Parses a string or number and returns the unit and numeric value
  */
-export function parseUnit(val: string | number | undefined, output?: Unit): Unit {
+export const parseUnit = (val: string | number | undefined, output?: Unit): Unit => {
   output = output || {} as Unit;
 
   if (!val && val !== 0) {
     output.unit = _;
     output.value = _;
-  } else if (typeof val === 'number') {
+  } else if (isNumber(val)) {
     output.unit = _;
     output.value = val as number;
   } else {
@@ -74,18 +83,12 @@ export function parseUnit(val: string | number | undefined, output?: Unit): Unit
 /**
  * returns the unit as a number (resolves seconds to milliseconds)
  */
-export function convertToSeconds(unit: Unit): number | undefined {
+export const convertToSeconds = (unit: Unit): number | undefined => {
   return unit.unit === 's' ? unit.value! * 1000 : unit.value;
 }
 
 
-export function random(first: number, last: number, unit?: string, wholeNumbersOnly?: boolean): number | string {
-  let val = first + (Math.random() * (last - first));
-  if (wholeNumbersOnly === true) {
-    val = Math.floor(val);
-  }
-  return !unit ? val : val + unit;
-}
+
 
 export type Unit = {
   value: number | undefined;

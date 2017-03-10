@@ -1,32 +1,14 @@
-import { SteelScene } from './internal';
-import { IAnimationEngine, ISceneJSON, Dictionary } from './types';
-import * as types from './types';
+import { importHTML } from './internal/steel';
+import { setEngine } from './internal/engine';
 
-// initialize default instance
-const bu = new SteelScene();
-
-// export default to namespace
-export const {
-  exportHTML,
-  exportJSON,
-  importHTML,
-  reset,
-  set,
-  transition
-} = bu;
-
-// export directly because of typing visibility
-export const importJSON = bu.importJSON as { (scenes: Dictionary<ISceneJSON>, reset: boolean): SteelScene };
-export const use = bu.use as { (a: IAnimationEngine): SteelScene };
-
-/**
- * Export all types to "types"
- */
-export { types };
+// export types and helpers to steel namespace
+export * from './types';
+export { exportJSON, importJSON, reset, set, transition, exportHTML } from './internal/steel';
+export { importHTML, setEngine as use }
 
 // auto-wire up document on DOMContentLoaded
 if (window && window.document) {
   document.addEventListener('DOMContentLoaded', () => {
-    bu.importHTML(document.body);
+    importHTML(document.body);
   });
 }

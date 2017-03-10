@@ -1,11 +1,16 @@
-import { State } from './state';
-import { Transition } from './transition';
-import { elementToScene } from './convert-dom';
-import { _, missingArg, resolveElement, assign, assignExcept, mapProperties } from '../utils';
-import { IAnimationEngine, Dictionary, ISceneJSON, ISetOperation, ITarget, ITimelineTween, IStateTween, ITargetTween } from '../types';
+import { Dictionary, ISetOperation, ITimelineTween, IStateTween, ITargetTween } from '../types';
+
+import {
+  _, appendElement, assign, createElement, defaultAttr, defaultName,
+  mapProperties, missingArg, nameAttr, resolveElement, setAttribute, sceneSelector
+} from '../utils';
+
+import {
+  IStateJSON, ITargetJSON, ITransitionJSON, getEngine, sceneElementToTransitions, sceneElementToStates,
+  State, stateToElement, Transition, transitionToElement
+} from './index';
 
 let globalId = 0;
-
 export class Scene {
   private states: Dictionary<State>;
   private transitions: Dictionary<Transition>;
@@ -15,7 +20,11 @@ export class Scene {
   private currentState: string;
   private id: number = ++globalId;
 
-  constructor(private engine: IAnimationEngine) { }
+  constructor(json?: ISceneJSON) {
+    if (json) {
+      this.fromJSON(json);
+    }
+  }
 
   public fromJSON(json: ISceneJSON): this {
     const self = this;
@@ -23,7 +32,7 @@ export class Scene {
     // load transitions into scene
     let defaultTransition: string | undefined;
     const transitions = {};
-    for (let transitionName in json.transitions) {
+    for (const transitionName in json.transitions) {
       const transitionJSON = json.transitions[transitionName];
       if (transitionJSON.default) {
         defaultTransition = transitionName;
@@ -34,7 +43,7 @@ export class Scene {
     // load states into scene
     let defaultState: string | undefined;
     const states = {};
-    for (let stateName in json.states) {
+    for (const stateName in json.states) {
       const stateJSON = json.states[stateName];
       if (stateJSON.default) {
         defaultState = stateName;
@@ -72,11 +81,11 @@ export class Scene {
     const toState = self.states[toStateName];
 
     // tell animation engine to set the state directly
-    self.engine.set(
+    getEngine().set(
       toState.targets
-        .map((t: ITarget): ISetOperation => ({
+        .map((t: ITargetJSON): ISetOperation => ({
           targets: t.ref,
-          set: assignExcept({}, assign({}, toState.props, t), ['ref'])
+          set: assign({}, ['ref'], toState.props, t)
         }))
     );
 
@@ -124,7 +133,7 @@ export class Scene {
         if (!tween) {
           targets[target.ref] = tween = [];
         }
-        tween.push(assignExcept({}, assign({}, fromState.props, target), ['ref']));
+        tween.push(assign({}, ['ref'], fromState.props, target));
       });
 
       // group to props by target
@@ -133,7 +142,7 @@ export class Scene {
         if (!tween) {
           targets[target.ref] = tween = [];
         }
-        tween.push(assignExcept({}, assign({}, toState.props, target), ['ref']));
+        tween.push(assign({}, ['ref'], toState.props, target));
       });
 
       // convert grouping to array of tween operations
@@ -162,7 +171,7 @@ export class Scene {
 
     // tell animation engine to transition
     // need some work on this, possible that this would be called repeatedly
-    self.engine.transition(
+    getEngine().transition(
       timelineTween,
       (stateName: string) => self.currentState = stateName
     );
@@ -177,4 +186,42 @@ export class Scene {
       transitions: mapProperties(self.transitions, (key, val) => val.toJSON())
     }
   }
+}
+
+export const sceneToElement = (scene: ISceneJSON): Element => {
+  const $scene = createElement(sceneSelector);
+
+  const states = scene.states;
+  for (const stateName in states) {
+    const $state = stateToElement(states[stateName]);
+    setAttribute($state, nameAttr, stateName);
+    appendElement($scene, $state);
+  }
+
+  const transitions = scene.transitions;
+  for (const transitionName in transitions) {
+    const transition = transitions[transitionName];
+    const $transition = transitionToElement(transition);
+    if (transitionName && transitionName !== defaultName) {
+      setAttribute($transition, nameAttr, transitionName);
+    }
+    if (transition.default) {
+      setAttribute($transition, defaultAttr, '');
+    }
+    appendElement($scene, $transition);
+  }
+
+  return $scene;
+}
+
+export const elementToScene = ($scene: Element): ISceneJSON => {
+  return {
+    states: sceneElementToStates($scene),
+    transitions: sceneElementToTransitions($scene)
+  };
+}
+
+export interface ISceneJSON {
+  states: Dictionary<IStateJSON>;
+  transitions: Dictionary<ITransitionJSON>;
 }

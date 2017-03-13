@@ -1,20 +1,39 @@
 import { Dictionary } from '../types';
 
 import {
-  appendElement,
-  createElement,
-  findElements,
-  getAttribute,
-  mapProperties,
-  missingArg, nameAttr,
-  resolveElement,
-  sceneSelector,
-  setAttribute
+  appendElement, createElement, findElements, getAttribute, mapProperties,
+  missingArg, nameAttr, resolveElement, sceneSelector, setAttribute
 } from '../utils';
 
 import { ISceneJSON, Scene, elementToScene, sceneToElement } from './index';
 
 let _scenes: Dictionary<Scene> = {};
+
+
+export const elementToScenes = (el: Element): Dictionary<ISceneJSON> => {
+  // find all layer elemenets
+  const scenes: Dictionary<ISceneJSON> = {};
+  findElements(sceneSelector, el).forEach($scene => {
+    // get the bane if the layer
+    const sceneName = getAttribute($scene, nameAttr);
+    if (!sceneName) {
+      throw missingArg(nameAttr);
+    }
+    // read element to pull in the layer definition
+    scenes[sceneName] = elementToScene($scene);
+  });
+  return scenes;
+};
+
+export const scenesToElement = (scenes: Dictionary<ISceneJSON>): Element => {
+  const $container = createElement('div');
+  for (const layerName in scenes) {
+    const $scene = sceneToElement(scenes[layerName]);
+    setAttribute($scene, nameAttr, layerName);
+    appendElement($container, $scene);
+  }
+  return $container;
+};
 
 export const exportJSON = (): Dictionary<ISceneJSON> => {
   return mapProperties(_scenes, (key, value) => value.toJSON())
@@ -74,28 +93,3 @@ export const transition = (sceneName: string, ...states: string[]): void => {
 }
 
 
-export function scenesToElement(scenes: Dictionary<ISceneJSON>): Element {
-  const $container = createElement('div');
-  for (const layerName in scenes) {
-    const $scene = sceneToElement(scenes[layerName]);
-    setAttribute($scene, nameAttr, layerName);
-    appendElement($container, $scene);
-  }
-  return $container;
-}
-
-
-export function elementToScenes(el: Element): Dictionary<ISceneJSON> {
-  // find all layer elemenets
-  const scenes: Dictionary<ISceneJSON> = {};
-  findElements(sceneSelector, el).forEach($scene => {
-    // get the bane if the layer
-    const sceneName = getAttribute($scene, nameAttr);
-    if (!sceneName) {
-      throw missingArg(nameAttr);
-    }
-    // read element to pull in the layer definition
-    scenes[sceneName] = elementToScene($scene);
-  });
-  return scenes;
-}

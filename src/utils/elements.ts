@@ -1,7 +1,17 @@
+import { convertToFloat } from './index';
+import { Dictionary } from '../types';
 import { _ } from './resources';
-import { copyArray } from './lists';
+import { copyArray, each } from './lists';
 
 export const htmlTest = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/;
+
+const BOOLEAN = 'boolean';
+const NUMBER = 'string';
+
+const propertyTypes = {
+  duration: NUMBER,
+  default: BOOLEAN
+};
 
 export const createElement = (tagName: string, innerHtml?: string): Element => {
   const $el = document.createElement(tagName);
@@ -11,12 +21,62 @@ export const createElement = (tagName: string, innerHtml?: string): Element => {
   return $el;
 }
 
-export const setAttribute = (el: Element, attrName: string, attrValue: string): void => {
-  return el.setAttribute(attrName, attrValue);
+export const convertFromAttributeValue = (name: string, value: any): any => {
+  const type = propertyTypes[name];
+  if (type === BOOLEAN) {
+    return true;
+  }
+  if (type === NUMBER) {
+    return convertToFloat(value);
+  }
+  return value;
+}
+
+export const convertToAttributeValue = (name: string, value: any): any => {
+  const type = propertyTypes[name];
+  if (type === BOOLEAN) {
+    return value === true ? '' : _;
+  }
+  if (type === NUMBER) {
+    return value !== _ ? value.toString() : _;
+  }
+  return value;
+}
+
+export const setAttribute = (el: Element, attrName: string, attrValue: any): void => {
+  return el.setAttribute(attrName, convertToAttributeValue(attrName, attrValue));
 };
 
+export const setAttributes = (el: Element, dict: Dictionary<any>, whitelist?: string[]): void => {
+  const hasWhitelist = whitelist && whitelist.length;
+  for (const name in dict) {
+    if (hasWhitelist && whitelist!.indexOf(name) === -1) {
+      continue;
+    }
+    el.setAttribute(name, convertToAttributeValue(name, dict[name]));
+  }
+};
+
+/**
+ * read a single attribute
+ */
 export const getAttribute = (el: Element, prop: string): string | undefined => {
-  return el.getAttribute(prop) || _;
+  return convertFromAttributeValue(prop, el.getAttribute(prop));
+};
+
+/**
+ * read all attribute pairs into a regular dictionary
+ */
+export const getAttributes = (el: Element, whitelist?: string[]): Dictionary<any> => {
+  const hasWhitelist = whitelist && whitelist.length;
+  const result = {};
+  each(el.attributes, att => {
+    if (hasWhitelist && whitelist!.indexOf(att.name) === -1) {
+      return;
+    }
+    result[att.name] = convertFromAttributeValue(att.name, att.value);
+  });
+  return result;
 };
 
 export const appendElement = (parent: Element, child: Element): void => {

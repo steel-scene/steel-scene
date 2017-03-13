@@ -5,8 +5,8 @@ export interface IAnimationEngine {
 }
 
 export interface ISetOperation {
-  targets: string;
-  set: Dictionary<any>;
+  targets: any[];
+  props: Dictionary<any>;
 }
 
 export interface ITimelineTween {
@@ -17,13 +17,13 @@ export interface ITimelineTween {
 export interface IStateTween {
   stateName: string;
   tweens: ITargetTween[];
-  duration: number;
-  easing: string | undefined;
 }
 
 export interface ITargetTween {
-  targets: string;
+  targets: any[];
   keyframes: Dictionary<any>[];
+  duration: number;
+  easing: string | undefined;
 }
 
 

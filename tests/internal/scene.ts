@@ -9,33 +9,20 @@ describe('dom', () => {
   describe('elementToScene', () => {
     it('should translate a <scene> to a Scene', () => {
 
-      const $target1a = document.createElement('s-target');
-      $target1a.setAttribute('ref', '#box1');
-      $target1a.setAttribute('x', '0');
+      const $stateInitial = document.createElement('s-state');
+      $stateInitial.setAttribute('name', 'initial');
+      $stateInitial.setAttribute('x', '0');
 
-      const $target2a = document.createElement('s-target');
-      $target2a.setAttribute('ref', '#box2');
-      $target2a.setAttribute('y', '0');
+      const $stateLeft = document.createElement('s-state');
+      $stateLeft.setAttribute('name', 'left');
+      $stateLeft.setAttribute('x', '-200');
 
-      const $statea = document.createElement('s-state');
-      $statea.setAttribute('name', 'first');
-      $statea.setAttribute('default', '');
+      const $target = document.createElement('s-target');
+      $target.setAttribute('ref', '#box');
 
-      $statea.appendChild($target1a);
-      $statea.appendChild($target2a);
+      $target.appendChild($stateInitial);
+      $target.appendChild($stateLeft);
 
-      const $target1b = document.createElement('s-target');
-      $target1b.setAttribute('ref', '#box1');
-      $target1b.setAttribute('x', '90px');
-
-      const $target2b = document.createElement('s-target');
-      $target2b.setAttribute('ref', '#box2');
-      $target2b.setAttribute('y', '90px');
-
-      const $stateb = document.createElement('s-state');
-      $stateb.setAttribute('name', 'second');
-      $stateb.appendChild($target1b);
-      $stateb.appendChild($target2b);
 
       const $transition = document.createElement('s-transition');
       $transition.setAttribute('default', '');
@@ -43,25 +30,18 @@ describe('dom', () => {
       $transition.setAttribute('easing', 'ease-in-out');
 
       const $scene = document.createElement('s-scene');
-      $scene.appendChild($statea);
-      $scene.appendChild($stateb);
+      $scene.appendChild($target);
       $scene.appendChild($transition);
 
       const scene = elementToScene($scene);
       assert.deepEqual(scene, {
-        states: {
-          first: {
-            default: true,
-            targets: [
-              { ref: '#box1', x: '0' },
-              { ref: '#box2', y: '0' }
-            ]
-          },
-          second: {
-            targets: [
-              { ref: '#box1', x: '90px' },
-              { ref: '#box2', y: '90px' }
-            ]
+        targets: {
+          '#box': {
+            ref: '#box',
+            states: {
+              initial: { name: 'initial', x: '0' },
+              left: { name: 'left', x: '-200' }
+            }
           }
         },
         transitions: {

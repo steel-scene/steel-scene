@@ -1,18 +1,28 @@
-import { Dictionary, ISetOperation, ITimelineTween, IStateTween, ITargetTween } from '../types';
+import { durationAttr, easingAttr } from '../utils/resources';
+import { Dictionary, ITargetTween, ITimelineTween, IStateTween } from '../types';
 
 import {
   _, appendElement, assign, createElement, defaultAttr, defaultName,
-  mapProperties, missingArg, nameAttr, resolveElement, setAttribute, sceneSelector
+  each, mapProperties, missingArg, nameAttr, resolveElement, setAttribute, sceneSelector
 } from '../utils';
 
 import {
-  IStateJSON, ITargetJSON, ITransitionJSON, getEngine, sceneElementToTransitions, sceneElementToStates,
-  State, stateToElement, Transition, transitionToElement
+  ITargetOptions, ITransitionJSON, getEngine, sceneElementToTransitions, sceneElementToTargets,
+  Target, targetToElement, Transition, transitionToElement
 } from './index';
+
+
+export const elementToScene = ($scene: Element): ISceneJSON => {
+  return {
+    targets: sceneElementToTargets($scene),
+    transitions: sceneElementToTransitions($scene)
+  };
+}
+
 
 let globalId = 0;
 export class Scene {
-  private states: Dictionary<State>;
+  private targets: Dictionary<Target>;
   private transitions: Dictionary<Transition>;
 
   private defaultTransition: string | undefined;
@@ -40,15 +50,15 @@ export class Scene {
       transitions[transitionName] = new Transition().fromJSON(transitionJSON);
     }
 
-    // load states into scene
+    // load targets into scene
     let defaultState: string | undefined;
-    const states = {};
-    for (const stateName in json.states) {
-      const stateJSON = json.states[stateName];
+    const targets = {};
+    for (const name in json.targets) {
+      const stateJSON = json.targets[name];
       if (stateJSON.default) {
-        defaultState = stateName;
+        defaultState = name;
       }
-      states[stateName] = new State().fromJSON(stateJSON);
+      targets[name] = new Target().fromJSON(stateJSON);
     }
 
     // a starting point is required
@@ -60,7 +70,7 @@ export class Scene {
     self.transitions = transitions;
     self.defaultState = defaultState;
     self.currentState = defaultState;
-    self.states = states;
+    self.targets = targets;
     return self;
   }
 
@@ -78,16 +88,25 @@ export class Scene {
 
   public set(toStateName: string): this {
     const self = this;
-    const toState = self.states[toStateName];
+
+    const setOperations = [];
+    for (const targetName in self.targets) {
+      const target = self.targets[targetName];
+      const state = target.states[toStateName];
+
+      // skip update operation target doesn't have state
+      if (!state) {
+        continue;
+      }
+
+      const targets = target.targets;
+      const props = assign({}, _, target.props, state);
+
+      setOperations.push({ targets, props });
+    }
 
     // tell animation engine to set the state directly
-    getEngine().set(
-      toState.targets
-        .map((t: ITargetJSON): ISetOperation => ({
-          targets: t.ref,
-          set: assign({}, ['ref'], toState.props, t)
-        }))
-    );
+    getEngine().set(setOperations)
 
     self.currentState = toStateName;
     return self;
@@ -95,78 +114,79 @@ export class Scene {
 
   public transition(states: string[]): this {
     const self = this;
+    const transitions = self.transitions;
 
     // find a suitable transition between the states
-    let fromStateName = self.currentState;
-    const stateTransfomer = (toStateName: string): IStateTween => {
-      const fromState = self.states[fromStateName];
-      const toState = self.states[toStateName];
-      const transitions = self.transitions;
+    const fromStates = mapProperties(self.targets, (key, val) => val.currentState);
 
-      // get duration from cascade of durations
-      const duration = toState.duration
-        || (!!toState.transition && transitions[toState.transition].duration)
-        || (!!self.defaultTransition && transitions[self.defaultTransition].duration)
-        || _;
+    const stateTweens: IStateTween[] = [];
 
-      // the engine won't know what to do without a duration
-      if (!duration) {
-        throw missingArg('duration');
-      }
+    each(states, toStateName => {
+      // capture a tween for each target in this state
+      const targetTweens: ITargetTween[] = [];
 
-      // get easing from cascade of easings
-      const easing: string | undefined = toState.easing
-        || (!!toState.transition && transitions[toState.transition].easing)
-        || (!!self.defaultTransition && transitions[self.defaultTransition].easing)
-        || _;
+      for (const targetName in self.targets) {
+        const target = self.targets[targetName];
 
-      // note: might be able to pass without an easing, not sure if good or bad
-      if (!easing) {
-        throw missingArg('easing');
-      }
-
-      const targets = {};
-
-      // group from props by target
-      fromState.targets.forEach(target => {
-        let tween = targets[target.ref];
-        if (!tween) {
-          targets[target.ref] = tween = [];
+        // lookup definition for the next state
+        const toState = target.states[toStateName];
+        if (!toState) {
+          // skip state transition if the target has no definition
+          continue;
         }
-        tween.push(assign({}, ['ref'], fromState.props, target));
-      });
 
-      // group to props by target
-      toState.targets.forEach(target => {
-        let tween = targets[target.ref];
-        if (!tween) {
-          targets[target.ref] = tween = [];
+        // get duration from cascade of durations
+        const duration = target.duration
+          || (target.transition && transitions[target.transition].duration)
+          || (self.defaultTransition && transitions[self.defaultTransition].duration)
+          || _;
+
+        // get easing from cascade of easings
+        const easing = target.easing
+          || (target.transition && transitions[target.transition].easing)
+          || (self.defaultTransition && transitions[self.defaultTransition].easing)
+          || _;
+
+        // note: might be able to pass without an easing, not sure if good or bad
+        if (!easing) {
+          throw missingArg(easingAttr);
         }
-        tween.push(assign({}, ['ref'], toState.props, target));
-      });
 
-      // convert grouping to array of tween operations
-      const tweenOptions: ITargetTween[] = [];
+        // the engine won't know what to do without a duration, will have to relax
+        // this if  we add physics based durations
+        if (!duration) {
+          throw missingArg(durationAttr);
+        }
 
-      for (const ref in targets) {
-        tweenOptions.push({
-          targets: ref,
-          keyframes: targets[ref]
+        // lookup last know state of this target
+        const fromStateName = fromStates[targetName];
+        const fromState = target.states[fromStateName];
+
+        // record the last known state of this target
+        fromStates[targetName] = toStateName;
+
+        // create a new tween with "from"" as 0 and "to"" as 1
+        targetTweens.push({
+          duration,
+          easing,
+          targets: target.targets,
+          keyframes: [
+            assign({}, _, fromState),
+            assign({}, _, toState)
+          ]
         });
       }
 
-      fromStateName = toStateName;
-      return {
-        tweens: tweenOptions,
+      // add completed list of tweens to state tween
+      stateTweens.push({
         stateName: toStateName,
-        duration,
-        easing
-      };
-    };
+        tweens: targetTweens
+      });
+    });
 
     const timelineTween: ITimelineTween = {
-      id: this.id,
-      states: states.map(stateTransfomer)
+      id: self.id,
+      states: stateTweens
     };
 
     // tell animation engine to transition
@@ -182,7 +202,7 @@ export class Scene {
   public toJSON(): ISceneJSON {
     const self = this;
     return {
-      states: mapProperties(self.states, (key, val) => val.toJSON()),
+      targets: mapProperties(self.targets, (key, val) => val.toJSON()),
       transitions: mapProperties(self.transitions, (key, val) => val.toJSON())
     }
   }
@@ -191,11 +211,11 @@ export class Scene {
 export const sceneToElement = (scene: ISceneJSON): Element => {
   const $scene = createElement(sceneSelector);
 
-  const states = scene.states;
-  for (const stateName in states) {
-    const $state = stateToElement(states[stateName]);
-    setAttribute($state, nameAttr, stateName);
-    appendElement($scene, $state);
+  const targets = scene.targets;
+  for (const targetName in targets) {
+    const $target = targetToElement(targets[targetName]);
+    setAttribute($target, nameAttr, targetName);
+    appendElement($scene, $target);
   }
 
   const transitions = scene.transitions;
@@ -214,14 +234,7 @@ export const sceneToElement = (scene: ISceneJSON): Element => {
   return $scene;
 }
 
-export const elementToScene = ($scene: Element): ISceneJSON => {
-  return {
-    states: sceneElementToStates($scene),
-    transitions: sceneElementToTransitions($scene)
-  };
-}
-
 export interface ISceneJSON {
-  states: Dictionary<IStateJSON>;
+  targets: Dictionary<ITargetOptions>;
   transitions: Dictionary<ITransitionJSON>;
 }

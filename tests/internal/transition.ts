@@ -13,7 +13,6 @@ describe('dom', () => {
 
       const transition = elementToTransition($transition);
       assert.deepEqual(transition, {
-        default: false,
         duration: 1000,
         easing: 'ease-in-out'
       });

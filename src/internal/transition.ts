@@ -1,15 +1,24 @@
 import { Dictionary } from '../types';
 import {
-  _, convertToFloat, createElement, defaultAttr, defaultName, durationAttr, easingAttr,
-  findElements, getAttribute, nameAttr, resolveElement, setAttribute, transitionSelector
+  _,
+  assign,
+  createElement,
+  defaultAttr,
+  defaultName,
+  durationAttr,
+  easingAttr,
+  findElements,
+  getAttribute,
+  getAttributes,
+  nameAttr,
+  resolveElement,
+  setAttribute,
+  transitionSelector
 } from '../utils';
 
-export const elementToTransition = ($transition: Element): ITransitionJSON =>  {
-  return {
-    default: $transition.hasAttribute(defaultAttr),
-    duration: convertToFloat(getAttribute($transition, durationAttr)),
-    easing: getAttribute($transition, easingAttr) || _
-  };
+const attributeNames = [defaultAttr, durationAttr, easingAttr];
+export const elementToTransition = (el: Element): ITransitionJSON => {
+  return getAttributes(el, attributeNames);
 }
 
 export class Transition {
@@ -18,8 +27,7 @@ export class Transition {
 
   public fromJSON(json: ITransitionJSON): this {
     const self = this;
-    self.duration = json.duration;
-    self.easing = json.easing;
+    assign(self, _, json);
     return self;
   }
 
@@ -32,12 +40,8 @@ export class Transition {
   }
 
   public toJSON(): ITransitionJSON {
-    const self = this;
-    return {
-      default: _,
-      duration: self.duration,
-      easing: self.easing
-    }
+    const {duration, easing} = this;
+    return { default: _, duration, easing }
   }
 }
 

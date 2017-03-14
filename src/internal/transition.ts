@@ -10,6 +10,9 @@ import {
   findElements,
   getAttribute,
   getAttributes,
+  isElement,
+  isString,
+  missingArg,
   nameAttr,
   resolveElement,
   setAttribute,
@@ -25,18 +28,21 @@ export class Transition {
   public duration: number | undefined;
   public easing: string | undefined;
 
-  public fromJSON(json: ITransitionJSON): this {
+  public load(json: Element | string | ITransitionJSON): this {
     const self = this;
+    if (!json) {
+      throw missingArg('json');
+    }
+
+    if (isString(json) || isElement(json)) {
+      return this.load(
+        elementToTransition(
+          resolveElement(json as (string | Element), true)
+        )
+      );
+    }
     assign(self, _, json);
     return self;
-  }
-
-  public fromHTML(html: Element | string): this {
-    return this.fromJSON(
-      elementToTransition(
-        resolveElement(html, true)
-      )
-    );
   }
 
   public toJSON(): ITransitionJSON {

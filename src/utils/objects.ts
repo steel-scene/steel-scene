@@ -44,6 +44,5 @@ export const convertToFloat = (numericString: string | undefined): number | unde
   return !numericString ? _ : parseFloat(numericString);
 };
 
-export const isNumber = (obj: any): boolean => {
-  return typeof obj === 'number';
-};
+export const isNumber = (obj: any) => typeof obj === 'number';
+export const isString = (obj: any) => typeof obj === 'string';

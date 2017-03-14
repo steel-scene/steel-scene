@@ -2,8 +2,21 @@ import { durationAttr, easingAttr } from '../utils/resources';
 import { Dictionary, ITargetTween, ITimelineTween, IStateTween } from '../types';
 
 import {
-  _, appendElement, assign, createElement, defaultAttr, defaultName,
-  each, mapProperties, missingArg, nameAttr, resolveElement, setAttribute, sceneSelector
+  _,
+  appendElement,
+  assign,
+  createElement,
+  defaultAttr,
+  defaultName,
+  each,
+  isElement,
+  isString,
+  mapProperties,
+  missingArg,
+  nameAttr,
+  resolveElement,
+  sceneSelector,
+  setAttribute
 } from '../utils';
 
 import {
@@ -32,12 +45,23 @@ export class Scene {
 
   constructor(json?: ISceneJSON) {
     if (json) {
-      this.fromJSON(json);
+      this.load(json);
     }
   }
 
-  public fromJSON(json: ISceneJSON): this {
+  public load(options: ISceneJSON | Element | string): this {
     const self = this;
+
+    if (!options) {
+      throw missingArg('options');
+    }
+
+    const json = isString(options) || isElement(options)
+      ? elementToScene(
+        resolveElement(options as (string | Element), true)
+      )
+      : options as ISceneJSON;
+
 
     // load transitions into scene
     let defaultTransition: string | undefined;
@@ -47,7 +71,7 @@ export class Scene {
       if (transitionJSON.default) {
         defaultTransition = transitionName;
       }
-      transitions[transitionName] = new Transition().fromJSON(transitionJSON);
+      transitions[transitionName] = new Transition().load(transitionJSON);
     }
 
     // load targets into scene
@@ -58,7 +82,7 @@ export class Scene {
       if (stateJSON.default) {
         defaultState = name;
       }
-      targets[name] = new Target().fromJSON(stateJSON);
+      targets[name] = new Target().load(stateJSON);
     }
 
     // a starting point is required
@@ -72,14 +96,6 @@ export class Scene {
     self.currentState = defaultState;
     self.targets = targets;
     return self;
-  }
-
-  public fromHTML(html: Element | string): this {
-    return this.fromJSON(
-      elementToScene(
-        resolveElement(html, true)
-      )
-    );
   }
 
   public reset(): this {

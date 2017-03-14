@@ -1,11 +1,43 @@
-import { refAttr } from '../../lib/utils';
 import { Dictionary } from '../types';
-import { stateToElement } from './index';
+
 import {
-  _, appendElement, assign, convertToFloat, createElement, defaultAttr,
-  durationAttr, each, easingAttr, findElements, getAttribute, getAttributes, nameAttr,
-  resolveElement, setAttributes, transitionAttr, targetSelector, stateSelector
+  _,
+  appendElement,
+  assign,
+  convertToFloat,
+  createElement,
+  defaultAttr,
+  durationAttr,
+  each,
+  easingAttr,
+  findElements,
+  getAttribute,
+  getAttributes,
+  isElement,
+  isString,
+  missingArg,
+  nameAttr,
+  refAttr,
+  resolveElement,
+  setAttribute,
+  setAttributes,
+  stateSelector,
+  targetSelector,
+  transitionAttr
 } from '../utils';
+
+export const stateToElement = (state: Dictionary<any>): Element => {
+  const $target = createElement(stateSelector);
+  for (let propName in state) {
+    const val = state[propName];
+    if (val === _) {
+      continue;
+    }
+    setAttribute($target, propName, val.toString());
+  }
+  return $target;
+}
+
 
 
 export const elementToTarget = ($target: Element): ITargetOptions => {
@@ -37,7 +69,6 @@ export const elementToTarget = ($target: Element): ITargetOptions => {
   return props;
 };
 
-
 export class Target {
   public duration: number | undefined;
   public transition: string | undefined;
@@ -48,22 +79,27 @@ export class Target {
   public props: Dictionary<any>;
   public states: Dictionary<Dictionary<any>>;
 
-  public fromJSON(json: ITargetOptions): this {
+  public load(options: ITargetOptions | Element | string): this {
     const self = this;
+    if (!options) {
+      throw missingArg('options');
+    }
+
+    if (isString(options) || isElement(options)) {
+      return this.load(
+        elementToTarget(
+          resolveElement(options as (string | Element), true)
+        )
+      );
+    }
+
+    const json = options as ITargetOptions;
     self.duration = json.duration;
     self.easing = json.easing;
     self.transition = json.transition;
     self.states = json.states;
     self.props = assign({}, [durationAttr, easingAttr, nameAttr, 'states', transitionAttr], json);
     return self;
-  }
-
-  public fromHTML(html: Element | string): this {
-    return this.fromJSON(
-      elementToTarget(
-        resolveElement(html, true)
-      )
-    );
   }
 
   public toJSON(): ITargetOptions {

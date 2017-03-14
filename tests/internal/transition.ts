@@ -5,6 +5,10 @@ const jsdom = require('mocha-jsdom');
 describe('dom', () => {
   jsdom();
 
+  describe('', () => {
+
+  });
+
   describe('elementToTransition', () => {
     it('should translate a <transition> to a Transition', () => {
       const $transition = document.createElement('s-transition');

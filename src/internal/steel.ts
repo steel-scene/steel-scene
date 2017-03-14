@@ -9,7 +9,6 @@ import { ISceneJSON, Scene, elementToScene, sceneToElement } from './index';
 
 let _scenes: Dictionary<Scene> = {};
 
-
 export const elementToScenes = (el: Element): Dictionary<ISceneJSON> => {
   // find all layer elemenets
   const scenes: Dictionary<ISceneJSON> = {};
@@ -75,7 +74,15 @@ export const importHTML = (options: Element | string, shouldReset: boolean = tru
   if (!el) {
     throw 'Could not load from ' + options;
   }
-  importJSON(elementToScenes(el), shouldReset);
+
+  _scenes = mapProperties(
+    elementToScenes(el),
+    (key, value) => new Scene(value)
+  );
+
+  if (shouldReset) {
+    reset();
+  }
 }
 
 /**

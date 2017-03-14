@@ -1,28 +1,9 @@
+import { guid } from '../utils/guid';
 import { Dictionary } from '../types';
 
 import {
-  _,
-  appendElement,
-  assign,
-  convertToFloat,
-  createElement,
-  defaultAttr,
-  durationAttr,
-  each,
-  easingAttr,
-  findElements,
-  getAttribute,
-  getAttributes,
-  isElement,
-  isString,
-  nameAttr,
-  refAttr,
-  resolveElement,
-  setAttribute,
-  setAttributes,
-  stateSelector,
-  targetSelector,
-  transitionAttr
+  _, assign, convertToFloat, createElement, defaultAttr, durationAttr, each, easingAttr, findElements, getAttribute, getAttributes, isElement, isString, nameAttr, refAttr, resolveElement,
+  setAttribute, stateSelector, targetSelector, transitionAttr
 } from '../utils';
 
 export const stateToElement = (state: Dictionary<any>): Element => {
@@ -65,13 +46,10 @@ export const elementToTarget = ($target: Element): ITargetOptions => {
   return props;
 };
 
-export function target(animatable?: undefined | string | Element | {}, options?: ITargetOptions | undefined): Target {
-  return new Target()
-    .targets(animatable!)
-    .load(options as ITargetOptions);
-}
 
 export class Target {
+  public readonly id: string = guid();
+
   public duration: number | undefined;
   public transition: string | undefined;
   public easing: string | undefined;
@@ -85,7 +63,7 @@ export class Target {
   public targets(target: string | Element | {}): this;
   public targets(target?: undefined | string | Element | {}): any[] | this {
     const self = this;
-    if (!target) {
+    if (!arguments.length) {
       return self._targets;
     }
     const targets = [];
@@ -159,18 +137,6 @@ export const sceneElementToTargets = ($scene: Element): Dictionary<ITargetOption
   return targets;
 }
 
-
-
-export const targetToElement = (target: ITargetOptions): Element => {
-  const $target = createElement(targetSelector);
-  setAttributes($target, target, [defaultAttr, durationAttr, easingAttr, transitionAttr]);
-
-  for (const stateName in target.states) {
-    appendElement($target, stateToElement(target.states[stateName]))
-  }
-  return $target;
-}
-
 export interface ITargetOptions {
   default?: boolean | undefined;
   duration?: number | undefined;
@@ -178,4 +144,10 @@ export interface ITargetOptions {
   transition?: string | undefined;
   states: Dictionary<Dictionary<any>>;
   [name: string]: boolean | number | string | Dictionary<any> | undefined;
+}
+
+export function target(animatable?: undefined | string | Element | {}, options?: ITargetOptions | undefined): Target {
+  return new Target()
+    .targets(animatable!)
+    .load(options as ITargetOptions);
 }

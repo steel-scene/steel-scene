@@ -1,17 +1,14 @@
+import { scene } from './scene';
 import { Dictionary } from '../types';
 
-import {
-  appendElement, createElement, findElements, getAttribute, mapProperties,
-  missingArg, nameAttr, resolveElement, sceneSelector, setAttribute
-} from '../utils';
+import { findElements, getAttribute, mapProperties, missingArg, nameAttr, resolveElement, sceneSelector } from '../utils';
 
-import { ISceneJSON, Scene, elementToScene, sceneToElement } from './index';
+import { ISceneOptions, Scene, elementToScene } from './index';
 
 let _scenes: Dictionary<Scene> = {};
-
-export const elementToScenes = (el: Element): Dictionary<ISceneJSON> => {
+export const elementToScenes = (el: Element): Dictionary<ISceneOptions> => {
   // find all layer elemenets
-  const scenes: Dictionary<ISceneJSON> = {};
+  const scenes: Dictionary<ISceneOptions> = {};
   findElements(sceneSelector, el).forEach($scene => {
     // get the bane if the layer
     const sceneName = getAttribute($scene, nameAttr);
@@ -24,45 +21,20 @@ export const elementToScenes = (el: Element): Dictionary<ISceneJSON> => {
   return scenes;
 };
 
-export const scenesToElement = (scenes: Dictionary<ISceneJSON>): Element => {
-  const $container = createElement('div');
-  for (const layerName in scenes) {
-    const $scene = sceneToElement(scenes[layerName]);
-    setAttribute($scene, nameAttr, layerName);
-    appendElement($container, $scene);
-  }
-  return $container;
-};
-
-export const exportJSON = (): Dictionary<ISceneJSON> => {
+export const exportJSON = (): Dictionary<ISceneOptions> => {
   return mapProperties(_scenes, (key, value) => value.toJSON())
-}
-
-export const exportHTML = (): Element => {
-  return scenesToElement(exportJSON());
-}
-
-/**
- * Sets all scenes to their initial state
- */
-export const reset = (): void => {
-  const scenes = _scenes;
-  for (let sceneName in scenes) {
-    scenes[sceneName].reset();
-  }
 }
 
 /**
  * Import scenes from JSON
  */
-export const importJSON = (scenes: Dictionary<ISceneJSON>, shouldReset: boolean = true): void => {
-  _scenes = mapProperties(
-    scenes,
-    (key, value) => new Scene(value)
-  );
+export const importJSON = (scenes: Dictionary<ISceneOptions>, shouldReset: boolean = true): void => {
+  _scenes = mapProperties(scenes, scene);
 
   if (shouldReset) {
-    reset();
+    for (const key in _scenes) {
+      _scenes[key].reset();
+    }
   }
 }
 
@@ -75,28 +47,11 @@ export const importHTML = (options: Element | string, shouldReset: boolean = tru
     throw 'Could not load from ' + options;
   }
 
-  _scenes = mapProperties(
-    elementToScenes(el),
-    (key, value) => new Scene(value)
-  );
+  _scenes = mapProperties(elementToScenes(el), scene);
 
   if (shouldReset) {
-    reset();
+    for (const key in _scenes) {
+      _scenes[key].reset();
+    }
   }
 }
-
-/**
- * Move directly to a state.  Do not pass GO.  Do not collect $200
- */
-export const set = (sceneName: string, toStateName: string): void => {
-  _scenes[sceneName].set(toStateName);
-}
-
-/**
- * Transition from the current state to new state
- */
-export const transition = (sceneName: string, ...states: string[]): void => {
-  _scenes[sceneName].transition(states);
-}
-
-

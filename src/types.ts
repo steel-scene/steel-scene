@@ -10,7 +10,7 @@ export interface ISetOperation {
 }
 
 export interface ITimelineTween {
-  id: number;
+  id: string;
   states: IStateTween[]
 }
 

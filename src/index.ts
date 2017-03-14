@@ -3,7 +3,10 @@ import { setEngine } from './internal/engine';
 
 // export types and helpers to steel namespace
 export * from './types';
-export { exportJSON, importJSON, reset, set, transition, exportHTML } from './internal/steel';
+export { exportJSON, importJSON } from './internal/steel';
+export { scene } from './internal/scene';
+export { target } from './internal/target';
+export { transition } from './internal/transition';
 export { importHTML, setEngine as use }
 
 // auto-wire up document on DOMContentLoaded

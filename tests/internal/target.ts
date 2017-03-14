@@ -3,7 +3,7 @@ import * as  assert from 'assert';
 
 const jsdom = require('mocha-jsdom');
 
-describe('dom', () => {
+describe('target', () => {
   jsdom();
 
   describe('elementToTarget', () => {

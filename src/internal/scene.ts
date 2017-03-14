@@ -115,7 +115,7 @@ export class Scene {
         continue;
       }
 
-      const targets = target.targets;
+      const targets = target.targets();
       const props = assign({}, _, target.props, state);
 
       setOperations.push({ targets, props });
@@ -185,7 +185,7 @@ export class Scene {
         targetTweens.push({
           duration,
           easing,
-          targets: target.targets,
+          targets: target.targets(),
           keyframes: [
             assign({}, _, fromState),
             assign({}, _, toState)

@@ -84,7 +84,13 @@ export const appendElement = (parent: Element, child: Element): void => {
 };
 
 export const findElements = (selector: string, parent?: Element): Element[] => {
-  return copyArray((parent || document).querySelectorAll(selector));
+  if (!parent) {
+    const resolvedElement = resolveElement(selector, false);
+    if (resolvedElement) {
+      return [resolvedElement];
+    }
+  }
+  return copyArray(parent!.querySelectorAll(selector));
 };
 
 export const isElement = (el: any): boolean => {

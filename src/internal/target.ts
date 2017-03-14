@@ -15,7 +15,6 @@ import {
   getAttributes,
   isElement,
   isString,
-  missingArg,
   nameAttr,
   refAttr,
   resolveElement,
@@ -38,10 +37,7 @@ export const stateToElement = (state: Dictionary<any>): Element => {
   return $target;
 }
 
-
-
 export const elementToTarget = ($target: Element): ITargetOptions => {
-
   const states: Dictionary<any> = {};
   findElements(stateSelector, $target).forEach(e => {
     const attributes = getAttributes(e, _);
@@ -69,31 +65,59 @@ export const elementToTarget = ($target: Element): ITargetOptions => {
   return props;
 };
 
+export function target(animatable?: undefined | string | Element | {}, options?: ITargetOptions | undefined): Target {
+  return new Target()
+    .targets(animatable!)
+    .load(options as ITargetOptions);
+}
+
 export class Target {
   public duration: number | undefined;
   public transition: string | undefined;
   public easing: string | undefined;
   public currentState: string;
 
-  public targets: any[];
+  public _targets: any[];
   public props: Dictionary<any>;
   public states: Dictionary<Dictionary<any>>;
 
-  public load(options: ITargetOptions | Element | string): this {
+  public targets(): any[];
+  public targets(target: string | Element | {}): this;
+  public targets(target?: undefined | string | Element | {}): any[] | this {
     const self = this;
+    if (!target) {
+      return self._targets;
+    }
+    const targets = [];
+
+    if (isString(target) || isElement(target)) {
+      const el = resolveElement(target as (string | Element), true)
+      targets.push(el);
+    } else {
+      targets.push(target);
+    }
+
+    self._targets = targets;
+
+    return self;
+  }
+
+  public load(options?: ITargetOptions | string | Element | undefined): this {
+    const self = this;
+    // skip if nothing was passed in
     if (!options) {
-      throw missingArg('options');
+      return self;
     }
 
+    let json: ITargetOptions;
     if (isString(options) || isElement(options)) {
-      return this.load(
-        elementToTarget(
-          resolveElement(options as (string | Element), true)
-        )
+      json = elementToTarget(
+        resolveElement(options as (string | Element), true)
       );
+    } else  {
+      json = options as ITargetOptions;
     }
 
-    const json = options as ITargetOptions;
     self.duration = json.duration;
     self.easing = json.easing;
     self.transition = json.transition;

@@ -1,13 +1,9 @@
-import { elementToTransition } from '../../src/internal';
+import { elementToTransition } from '../../src/internal/transition';
 import * as  assert from 'assert';
 const jsdom = require('mocha-jsdom');
 
 describe('dom', () => {
   jsdom();
-
-  describe('', () => {
-
-  });
 
   describe('elementToTransition', () => {
     it('should translate a <transition> to a Transition', () => {

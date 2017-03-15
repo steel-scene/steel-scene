@@ -1,13 +1,12 @@
-import { importHTML } from './internal/steel';
+import { importHTML, importJSON } from './internal/steel';
 import { setEngine } from './internal/engine';
 
 // export types and helpers to steel namespace
 export * from './types';
-export { exportJSON, importJSON } from './internal/steel';
 export { scene } from './internal/scene';
 export { target } from './internal/target';
 export { transition } from './internal/transition';
-export { importHTML, setEngine as use }
+export { importJSON, importHTML, setEngine as use }
 
 // auto-wire up document on DOMContentLoaded
 if (window && window.document) {

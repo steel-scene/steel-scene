@@ -1,16 +1,13 @@
-import { convertToFloat } from './index';
+import { toFloat, isString } from './objects';
 import { Dictionary } from '../types';
-import { _ } from './resources';
-import { copyArray, each } from './lists';
+import { _, BOOLEAN, NUMBER} from './constants';
+import { each } from './lists';
 
-export const htmlTest = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/;
-
-const BOOLEAN = 'boolean';
-const NUMBER = 'string';
+const htmlTest = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/;
 
 const propertyTypes = {
-  duration: NUMBER,
-  default: BOOLEAN
+  default: BOOLEAN,
+  duration: NUMBER
 };
 
 export const createElement = (tagName: string, innerHtml?: string): Element => {
@@ -27,7 +24,7 @@ export const convertFromAttributeValue = (name: string, value: any): any => {
     return true;
   }
   if (type === NUMBER) {
-    return convertToFloat(value);
+    return toFloat(value);
   }
   return value;
 }
@@ -43,24 +40,10 @@ export const convertToAttributeValue = (name: string, value: any): any => {
   return value;
 }
 
-export const setAttribute = (el: Element, attrName: string, attrValue: any): void => {
-  return el.setAttribute(attrName, convertToAttributeValue(attrName, attrValue));
-};
-
-export const setAttributes = (el: Element, dict: Dictionary<any>, whitelist?: string[]): void => {
-  const hasWhitelist = whitelist && whitelist.length;
-  for (const name in dict) {
-    if (hasWhitelist && whitelist!.indexOf(name) === -1) {
-      continue;
-    }
-    el.setAttribute(name, convertToAttributeValue(name, dict[name]));
-  }
-};
-
 /**
  * read a single attribute
  */
-export const getAttribute = (el: Element, prop: string): string | undefined => {
+export const getAttribute = (el: Element, prop: string): string => {
   return convertFromAttributeValue(prop, el.getAttribute(prop));
 };
 
@@ -90,16 +73,14 @@ export const findElements = (selector: string, parent?: Element): Element[] => {
       return [resolvedElement];
     }
   }
-  return copyArray(parent!.querySelectorAll(selector));
+  return Array.prototype.slice.call(parent!.querySelectorAll(selector));
 };
 
 export const isElement = (el: any): boolean => {
-  return el && typeof el.tagName === 'string';
+  return el && isString(el.tagName);
 }
 
-export function resolveElement(elOrSelector: Element | string, throwIfFalse: true): Element;
-export function resolveElement(elOrSelector: Element | string, throwIfFalse: false): Element | undefined;
-export function resolveElement(elOrSelector: Element | string, throwIfFalse?: boolean): Element | undefined {
+export function resolveElement(elOrSelector: Element | string, throwIfFalse?: boolean) {
   if (isElement(elOrSelector)) {
     return elOrSelector as Element
   }
@@ -108,7 +89,7 @@ export function resolveElement(elOrSelector: Element | string, throwIfFalse?: bo
   }
   const el = document.querySelector(elOrSelector as string) || _;
   if (throwIfFalse && !el) {
-    throw 'Could not resolve html/element'
+    throw 'element not found'
   }
   return el;
 };

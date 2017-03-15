@@ -23,7 +23,7 @@ export interface ITargetTween {
   targets: any[];
   keyframes: Dictionary<any>[];
   duration: number;
-  easing: string | undefined;
+  easing: string;
 }
 
 

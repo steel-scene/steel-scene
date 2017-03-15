@@ -1,4 +1,4 @@
-import { parseUnit, Unit } from '../../src/utils';
+import { parseUnit, Unit } from '../../src/utils/units';
 import * as assert from 'assert';
 
 describe('parseUnit', () => {

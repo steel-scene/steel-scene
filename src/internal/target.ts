@@ -1,153 +1,85 @@
+import { findElements, getAttributes, isElement, resolveElement } from '../utils/elements';
 import { guid } from '../utils/guid';
+import { assign, isString } from '../utils/objects';
+import { _, S_STATE } from '../utils/constants';
 import { Dictionary } from '../types';
-
-import {
-  _, assign, convertToFloat, createElement, defaultAttr, durationAttr, each, easingAttr, findElements, getAttribute, getAttributes, isElement, isString, nameAttr, refAttr, resolveElement,
-  setAttribute, stateSelector, targetSelector, transitionAttr
-} from '../utils';
-
-export const stateToElement = (state: Dictionary<any>): Element => {
-  const $target = createElement(stateSelector);
-  for (let propName in state) {
-    const val = state[propName];
-    if (val === _) {
-      continue;
-    }
-    setAttribute($target, propName, val.toString());
-  }
-  return $target;
-}
 
 export const elementToTarget = ($target: Element): ITargetOptions => {
   const states: Dictionary<any> = {};
-  findElements(stateSelector, $target).forEach(e => {
+  findElements(S_STATE, $target).forEach(e => {
     const attributes = getAttributes(e, _);
+    // tslint:disable-next-line:no-string-literal
     states[attributes['name']] = attributes;
   });
 
-
   // read all "state" elements
   // assemble state elements and properties and to the list
-  const props = { states } as ITargetOptions;
-
-  each($target.attributes, att => {
-    const name = att.name;
-    if (name === nameAttr) {
-      // do nothing
-    } else if (name === durationAttr) {
-      props.duration = convertToFloat(getAttribute($target, durationAttr));
-    } else if (name === defaultAttr) {
-      props.default = true;
-    } else {
-      props[name] = att.value;
-    }
-  });
-
+  const props = getAttributes($target, _) as ITargetOptions;
+  props.states = states;
   return props;
 };
 
 
 export class Target {
-  public readonly id: string = guid();
+  readonly id: string = guid();
 
-  public duration: number | undefined;
-  public transition: string | undefined;
-  public easing: string | undefined;
-  public currentState: string;
+  duration: number;
+  transition: string;
+  easing: string;
+  currentState: string;
 
-  public _targets: any[];
-  public props: Dictionary<any>;
-  public states: Dictionary<Dictionary<any>>;
+  _targets: any[];
+  props: Dictionary<any>;
+  states: Dictionary<Dictionary<any>>;
 
-  public targets(): any[];
-  public targets(target: string | Element | {}): this;
-  public targets(target?: undefined | string | Element | {}): any[] | this {
+  /** returns the targets */
+  targets(): any[];
+  /** sets the targets, returns this */
+  targets(target: string | Element | {}): this;
+
+  targets(target?: string | Element | {}) {
     const self = this;
     if (!arguments.length) {
       return self._targets;
     }
-    const targets = [];
 
-    if (isString(target) || isElement(target)) {
-      const el = resolveElement(target as (string | Element), true)
-      targets.push(el);
-    } else {
-      targets.push(target);
+    if (isString(target)) {
+      target = resolveElement(target as string, true)
     }
 
-    self._targets = targets;
-
+    self._targets = [ target ];
     return self;
   }
 
-  public load(options?: ITargetOptions | string | Element | undefined): this {
+  /** loads from a selector, element, htmlString, or json options, returns this */
+  load(options?: ITargetOptions | string | Element): this {
     const self = this;
     // skip if nothing was passed in
     if (!options) {
       return self;
     }
 
-    let json: ITargetOptions;
     if (isString(options) || isElement(options)) {
-      json = elementToTarget(
-        resolveElement(options as (string | Element), true)
-      );
-    } else  {
-      json = options as ITargetOptions;
+      const element = resolveElement(options as (string | Element), true);
+      options = elementToTarget(element);
     }
 
-    self.duration = json.duration;
-    self.easing = json.easing;
-    self.transition = json.transition;
-    self.states = json.states;
-    self.props = assign({}, [durationAttr, easingAttr, nameAttr, 'states', transitionAttr], json);
+    self.props = assign({}, _, options);
     return self;
   }
-
-  public toJSON(): ITargetOptions {
-    const self = this;
-    return {
-      duration: self.duration,
-      easing: self.easing,
-      transition: self.transition,
-      states: self.states
-    }
-  }
 }
 
-export const sceneElementToTargets = ($scene: Element): Dictionary<ITargetOptions> => {
-  // find all "state" elements
-  const targets: Dictionary<ITargetOptions> = {};
-
-  // assemble all states (nodes)... each ref refers to an element and its
-  // properties instruct the animation engine what propertie to set
-  findElements(targetSelector, $scene).forEach($target => {
-    // read element to pull in state definiton
-    const target = elementToTarget($target);
-    const targetRef = getAttribute($target, refAttr) || _;
-
-    // skip if no name present and not marked default
-    if (!targetRef) {
-      return;
-    }
-
-    targets[targetRef] = target;
-  });
-
-  return targets;
-}
 
 export interface ITargetOptions {
-  default?: boolean | undefined;
-  duration?: number | undefined;
-  easing?: string | undefined;
-  transition?: string | undefined;
+  default?: boolean;
+  duration?: number;
+  easing?: string;
+  transition?: string;
   states: Dictionary<Dictionary<any>>;
-  [name: string]: boolean | number | string | Dictionary<any> | undefined;
+  name: string;
+  [name: string]: boolean | number | string | Dictionary<any>;
 }
 
-export function target(animatable?: undefined | string | Element | {}, options?: ITargetOptions | undefined): Target {
-  return new Target()
-    .targets(animatable!)
-    .load(options as ITargetOptions);
+export function target(animatable?: string | Element | {}, options?: ITargetOptions): Target {
+  return new Target().targets(animatable!).load(options as ITargetOptions);
 }

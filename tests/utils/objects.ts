@@ -1,4 +1,4 @@
-import { assign } from '../../src/utils';
+import { assign } from '../../src/utils/objects';
 import * as  assert from 'assert';
 
 describe('objects', () => {

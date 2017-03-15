@@ -1,4 +1,4 @@
-import { elementToScene } from '../../src/internal';
+import { elementToScene } from '../../src/internal/scene';
 
 import * as  assert from 'assert';
 const jsdom = require('mocha-jsdom');
@@ -35,22 +35,22 @@ describe('dom', () => {
 
       const scene = elementToScene($scene);
       assert.deepEqual(scene, {
-        targets: {
-          '#box': {
+        targets: [
+          {
             ref: '#box',
             states: {
               initial: { name: 'initial', x: '0' },
               left: { name: 'left', x: '-200' }
             }
           }
-        },
-        transitions: {
-          _: {
+        ],
+        transitions: [
+          {
             default: true,
             duration: 1000,
             easing: 'ease-in-out'
           }
-        }
+        ]
       });
     });
   });

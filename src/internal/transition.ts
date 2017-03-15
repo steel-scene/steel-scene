@@ -1,38 +1,24 @@
+import { getAttributes, isElement, resolveElement } from '../utils/elements';
 import { guid } from '../utils/guid';
-import { Dictionary } from '../types';
-import {
-  _,
-  assign,
-  defaultAttr,
-  defaultName,
-  durationAttr,
-  easingAttr,
-  findElements,
-  getAttribute,
-  getAttributes,
-  isElement,
-  isString,
-  missingArg,
-  nameAttr,
-  resolveElement,
-  transitionSelector
-} from '../utils';
+import { assign, isString } from '../utils/objects';
+import { _, DEFAULT, DURATION, EASING, NAME } from '../utils/constants';
+import { missingArg } from '../utils/errors';
 
-const attributeNames = [defaultAttr, durationAttr, easingAttr];
-export const elementToTransition = (el: Element): ITransitionJSON => {
-  return getAttributes(el, attributeNames);
+const transitionAttributeWhitelist = [DEFAULT, DURATION, EASING, NAME];
+export const elementToTransition = (el: Element): ITransitionOptions => {
+  return getAttributes(el, transitionAttributeWhitelist);
 }
 
 export class Transition {
-  public readonly id: string = guid();
+  readonly id: string = guid();
 
-  public duration: number | undefined;
-  public easing: string | undefined;
-  private _name: string | undefined;
+  duration: number;
+  easing: string;
+  _name: string;
 
-  public name(): string | undefined;
-  public name(name: string | undefined): this;
-  public name(name?: string): string | undefined | this {
+  name(): string;
+  name(name: string): this;
+  name(name?: string): string | this {
     const self = this;
     if (!arguments.length) {
       return self._name;
@@ -41,62 +27,31 @@ export class Transition {
     return self;
   }
 
-  public load(options: Element | string | ITransitionJSON): this {
+  load(options: Element | string | ITransitionOptions): this {
     const self = this;
     if (!options) {
       throw missingArg('json');
     }
 
     if (isString(options) || isElement(options)) {
-      return this.load(
-        elementToTransition(
-          resolveElement(options as (string | Element), true)
-        )
-      );
+      const element = resolveElement(options as (string | Element), true);
+      options =  elementToTransition(element);
     }
+
     assign(self, _, options);
     return self;
   }
-
-  public toJSON(): ITransitionJSON {
-    const {duration, easing, _name } = this;
-    return { default: _, duration, easing, name: _name }
-  }
 }
 
-
-
-export const sceneElementToTransitions = ($scene: Element): Dictionary<ITransitionJSON> => {
-  // assemble all transitions (the edges between nodes)
-  const transitions: Dictionary<ITransitionJSON> = {};
-
-  // find all "transition" elements
-  findElements(transitionSelector, $scene).forEach($transition => {
-    const transition = elementToTransition($transition as Element);
-    const name = getAttribute($transition as Element, nameAttr)
-      || (transition.default ? defaultName : _);
-
-    // skip if no name present and not marked default
-    if (!name) {
-      return;
-    }
-
-    // add to list, merge if duplicate
-    transitions[name] = transition;
-  });
-
-  return transitions;
+export interface ITransitionOptions {
+  default?: boolean;
+  name?: string;
+  duration?: number;
+  easing?: string;
 }
 
-export interface ITransitionJSON {
-  default?: boolean | undefined;
-  name?: string | undefined;
-  duration?: number | undefined;
-  easing?: string | undefined;
-}
-
-export function transition(name?: string, options?: Element | string | ITransitionJSON): Transition {
+export function transition(name?: string, options?: Element | string | ITransitionOptions): Transition {
   return new Transition()
     .name(name)
-    .load(options as ITransitionJSON);
+    .load(options as ITransitionOptions);
 }

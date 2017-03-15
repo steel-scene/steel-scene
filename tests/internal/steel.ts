@@ -23,37 +23,39 @@ describe('dom', () => {
       </s-scene>`;
 
       const scenes = elementToScenes($element);
-      assert.deepEqual(scenes, {
-        boxes: {
-          targets: {
-            '#box1': {
+      assert.deepEqual(scenes, [
+        {
+          name: 'boxes',
+          targets: [
+            {
               ref: '#box1',
               states: {
                 C: { name: 'C', x: '0', y: '0', rotation: '0deg' },
                 NE: { name: 'NE', x: '100px', y: '-100px', rotation: '45deg' }
               }
             },
-            '#box2': {
+            {
               ref: '#box2',
               states: {
                 C: { name: 'C', x: '0', y: '0', rotation: '0deg' },
                 NE: { name: 'NE', x: '100px', y: '-100px', rotation: '45deg' }
               }
             }
-          },
-          transitions: {
-            _: {
+          ],
+          transitions: [
+            {
               default: true,
               duration: 1500,
               easing: 'Power2.easeOut'
             },
-            fast: {
+            {
               duration: 500,
-              easing: 'Power3.easeInOut'
+              easing: 'Power3.easeInOut',
+              name: 'fast'
             }
-          }
+          ]
         }
-      });
+      ]);
     });
   });
 

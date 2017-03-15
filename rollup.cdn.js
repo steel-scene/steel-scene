@@ -7,26 +7,27 @@ module.exports = {
     moduleName: 'steel',
     plugins: [
         typescript({
+            "moduleResolution": "node",
+            "newLine": "LF",
+            "rootDir": "src",
+            "target": "es5",
+            "typescript": require('typescript'),
             "allowUnreachableCode": false,
             "allowUnusedLabels": false,
             "declaration": false,
             "forceConsistentCasingInFileNames": true,
             "inlineSourceMap": false,
-            "moduleResolution": "node",
-            "newLine": "LF",
             "noFallthroughCasesInSwitch": true,
-            "noImplicitAny": true,
-            "noImplicitReturns": true,
+            "noImplicitAny": false,
+            "noImplicitReturns": false,
             "noImplicitUseStrict": true,
+            "noImplicitThis": true,
             "noUnusedLocals": true,
             "preserveConstEnums": false,
             "removeComments": true,
-            "rootDir": "src",
             "sourceMap": false,
-            "strictNullChecks": true,
-            "suppressImplicitAnyIndexErrors": true,
-            "target": "es5",
-            "typescript": require('typescript')
+            "strictNullChecks": false,
+            "suppressImplicitAnyIndexErrors": true
         })
     ]
 };

@@ -1,4 +1,4 @@
-import { elementToTarget } from '../../src/internal';
+import { elementToTarget } from '../../src/internal/target';
 import * as  assert from 'assert';
 
 const jsdom = require('mocha-jsdom');

@@ -1,85 +1,117 @@
-import { findElements, getAttributes, isElement, resolveElement } from '../utils/elements';
-import { guid } from '../utils/guid';
-import { assign, isString } from '../utils/objects';
-import { _, S_STATE } from '../utils/constants';
-import { Dictionary } from '../types';
+import { findElements, getAttributes, getTargets, isElement, resolveElement } from '../utils/elements'
+import { guid } from '../utils/guid'
+import { assign, isString } from '../utils/objects'
+import { _, S_STATE, STATES, SELECT, STEEL_TARGET } from '../utils/constants';
+import { AnimationTargetOptions, AnimationTarget, Dictionary } from '../types'
+
+const targetAttributeBlackList = [STATES, SELECT];
 
 export const elementToTarget = ($target: Element): ITargetOptions => {
-  const states: Dictionary<any> = {};
+  const states: Dictionary<any> = {}
   findElements(S_STATE, $target).forEach(e => {
-    const attributes = getAttributes(e, _);
+    const attributes = getAttributes(e, _)
     // tslint:disable-next-line:no-string-literal
-    states[attributes['name']] = attributes;
-  });
+    states[attributes['name']] = attributes
+  })
 
   // read all "state" elements
   // assemble state elements and properties and to the list
-  const props = getAttributes($target, _) as ITargetOptions;
-  props.states = states;
-  return props;
-};
+  const props = getAttributes($target, _) as ITargetOptions
+  props.states = states
+  return props
+}
 
 
 export class Target {
-  readonly id: string = guid();
+  readonly id: string = guid()
 
-  duration: number;
-  transition: string;
-  easing: string;
-  currentState: string;
+  duration: number
+  transition: string
+  easing: string
+  currentState: string
 
-  _targets: any[];
-  props: Dictionary<any>;
-  states: Dictionary<Dictionary<any>>;
+  _targets: (Element | {})[] = []
+  props: Dictionary<any> = {}
+  states: Dictionary<Dictionary<any>> = {}
 
   /** returns the targets */
-  targets(): any[];
+  targets(): AnimationTarget;
   /** sets the targets, returns this */
-  targets(target: string | Element | {}): this;
+  targets(...animationTargets: AnimationTargetOptions[]): this;
 
-  targets(target?: string | Element | {}) {
-    const self = this;
+  targets(...animationTargets: AnimationTargetOptions[]): this | AnimationTarget {
+    const self = this
     if (!arguments.length) {
-      return self._targets;
+      return self._targets
     }
 
-    if (isString(target)) {
-      target = resolveElement(target as string, true)
-    }
+    // unassign self from all current targets
+    self._targets.forEach(t => {
+      if (t[STEEL_TARGET]) {
+        t[STEEL_TARGET] = _
+      }
+    })
 
-    self._targets = [ target ];
-    return self;
+    // detect targets
+    const targets = getTargets(animationTargets)
+
+    // reassign targets
+    targets.forEach(t => t[STEEL_TARGET] = self)
+
+    self._targets = targets
+    return self
   }
 
   /** loads from a selector, element, htmlString, or json options, returns this */
   load(options?: ITargetOptions | string | Element): this {
-    const self = this;
+    const self = this
     // skip if nothing was passed in
     if (!options) {
-      return self;
+      return self
     }
 
     if (isString(options) || isElement(options)) {
-      const element = resolveElement(options as (string | Element), true);
-      options = elementToTarget(element);
+      const element = resolveElement(options as (string | Element), true)
+      options = elementToTarget(element)
     }
 
-    self.props = assign({}, _, options);
-    return self;
+    self.states = options[STATES]
+    self.props = assign({}, targetAttributeBlackList, options)
+    return self
   }
 }
 
 
 export interface ITargetOptions {
-  default?: boolean;
-  duration?: number;
-  easing?: string;
-  transition?: string;
-  states: Dictionary<Dictionary<any>>;
-  name: string;
-  [name: string]: boolean | number | string | Dictionary<any>;
+  default?: boolean
+  duration?: number
+  easing?: string
+  transition?: string
+  states: Dictionary<Dictionary<any>>
+  select: string;
+  [name: string]: boolean | number | string | Dictionary<any>
 }
 
-export function target(animatable?: string | Element | {}, options?: ITargetOptions): Target {
-  return new Target().targets(animatable!).load(options as ITargetOptions);
+export function target(animationTargets?: AnimationTargetOptions, options?: ITargetOptions): Target {
+    // if transition has a name and is not auto-named, try to locate an existing scene
+    const targets = getTargets(animationTargets)
+
+    // if any targets could be resolved
+    let t: Target = _
+    if (targets.length) {
+      const targetInstance = targets[0][STEEL_TARGET]
+
+      // only treat this as a new target if targets haven't changed
+      const allSameTarget = targetInstance !== _ && targets.every(t2 => t2[STEEL_TARGET] === targetInstance)
+      if (allSameTarget) {
+        t = targetInstance
+      }
+    }
+    if (!t) {
+      t = new Target().targets(targets)
+    }
+    if (options) {
+      t.load(options)
+    }
+    return t
 }

@@ -40,10 +40,10 @@ There are two different ways to build out animations with SteelScene.  The most 
 
 <s-scene name="boxes">
     <s-state name="hiddenLeft" default>
-        <s-target ref="#box1" opacity="0" x="-50px" />
+        <s-target select="#box1" opacity="0" x="-50px" />
     </s-state>
     <s-state name="reset">
-        <s-target ref="#box1" opacity="1" x="0" />
+        <s-target select="#box1" opacity="1" x="0" />
     </s-state>
     <s-transition easing="ease-out" duration="250" default />
 </s-scene>
@@ -63,12 +63,12 @@ const json = {
             hiddenLeft: {
                 default: true,
                 targets: [
-                    { ref: '#box1', opacity: '0', x: '-50px' }
+                    { select: '#box1', opacity: '0', x: '-50px' }
                 ]
             },
             reset: {
                 targets: [
-                    { ref: '#box1', opacity: '1', x: '0' }
+                    { select: '#box1', opacity: '1', x: '0' }
                 ]
             }
         },

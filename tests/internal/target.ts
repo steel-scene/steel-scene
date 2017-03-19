@@ -1,30 +1,30 @@
-import { elementToTarget } from '../../src/internal/target';
-import * as  assert from 'assert';
+import { elementToTarget } from '../../src/internal/target'
+import * as  assert from 'assert'
 
-const jsdom = require('mocha-jsdom');
+const jsdom = require('mocha-jsdom')
 
 describe('target', () => {
-  jsdom();
+  jsdom()
 
   describe('elementToTarget', () => {
     it('should translate a <target> to a Target', () => {
-      const $stateInitial = document.createElement('s-state');
-      $stateInitial.setAttribute('name', 'initial');
-      $stateInitial.setAttribute('transform', 'none');
+      const $stateInitial = document.createElement('s-state')
+      $stateInitial.setAttribute('name', 'initial')
+      $stateInitial.setAttribute('transform', 'none')
 
-      const $stateLeft = document.createElement('s-state');
-      $stateLeft.setAttribute('name', 'left');
-      $stateLeft.setAttribute('transform', 'translate(-200px)');
+      const $stateLeft = document.createElement('s-state')
+      $stateLeft.setAttribute('name', 'left')
+      $stateLeft.setAttribute('transform', 'translate(-200px)')
 
-      const $target = document.createElement('s-target');
-      $target.setAttribute('ref', '#box');
+      const $target = document.createElement('s-target')
+      $target.setAttribute('select', '#box')
 
-      $target.appendChild($stateInitial);
-      $target.appendChild($stateLeft);
+      $target.appendChild($stateInitial)
+      $target.appendChild($stateLeft)
 
-      const target = elementToTarget($target);
+      const target = elementToTarget($target)
       assert.deepEqual(target, {
-        ref: '#box',
+        select: '#box',
         states: {
           initial: {
             name: 'initial',
@@ -35,7 +35,7 @@ describe('target', () => {
             transform: 'translate(-200px)'
           }
         }
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})

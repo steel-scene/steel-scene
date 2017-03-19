@@ -1,7 +1,28 @@
-import { List } from '../types';
+import { List } from '../types'
+import { _ } from './constants'
 
-export const each = <TInput>(items: List<TInput>, action: { (input: TInput, index?: number): void }): void  => {
+export const each = <TInput>(items: List<TInput>, action: { (input: TInput, index?: number): void })  => {
   for (let i = 0, len = items.length; i < len; i++) {
-    action(items[i], i);
+    action(items[i], i)
   }
-};
+}
+
+export const head = <TInput>(items: List<TInput>, func: { (input: TInput): boolean }): TInput  => {
+  for (let i = 0, len = items.length; i < len; i++) {
+    if (func(items[i])) {
+      return items[i]
+    }
+  }
+  return _
+}
+
+export const contains = <TInput>(items: TInput[], item: TInput) => {
+  return items.indexOf(item) !== -1
+}
+
+export const removeFromList = <TInput>(items: TInput[], item: TInput) => {
+  const index = items.indexOf(item)
+  if (index !== -1) {
+    items.splice(index, 1)
+  }
+}

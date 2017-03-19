@@ -1,1 +1,1 @@
-export const missingArg = (argName: string) => argName + ' is required';
+export const missingArg = (argName: string) => argName + ' is required'

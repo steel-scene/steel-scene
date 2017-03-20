@@ -20,7 +20,8 @@ export class Transition {
   easing: string
 
   constructor(name: string) {
-    this.name = name || this.id
+    const self = this;
+    self.name = name || self.id
   }
 
   load(options: Element | string | ITransitionOptions): this {
@@ -30,12 +31,15 @@ export class Transition {
     }
 
     if (isString(options) || isElement(options)) {
-      const element = resolveElement(options as (string | Element), true)
-      options =  elementToTransition(element)
+      options = elementToTransition(
+        resolveElement(
+          options as (string | Element),
+          true
+        )
+      )
     }
 
-    assign(self, _, options)
-    return self
+    return assign(self, _, options)
   }
 }
 

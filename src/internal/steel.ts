@@ -1,5 +1,5 @@
 import { findElements, resolveElement } from '../utils/elements'
-import { S_SCENE } from '../utils/constants'
+import { _, S_SCENE } from '../utils/constants'
 import { elementToScene, ISceneOptions, scene } from './scene'
 
 export const elementToScenes = (el: Element) => findElements(S_SCENE, el).map(elementToScene)
@@ -8,7 +8,7 @@ export const elementToScenes = (el: Element) => findElements(S_SCENE, el).map(el
  * Import scenes from JSON
  */
 export const importJSON = (scenesOptions: ISceneOptions[]) => {
-  scenesOptions.forEach((sceneOptions, i) => scene(`__scene__${i}`, sceneOptions))
+  scenesOptions.forEach((sceneOptions, i) => scene(_, sceneOptions))
 }
 
 /**

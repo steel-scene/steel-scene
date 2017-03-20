@@ -1,13 +1,16 @@
+// import from utils
+import { _, DEFAULT, DURATION, EASING, INITIAL, NAME, S_TARGET, S_TRANSITION, TRANSITION } from '../utils/constants'
 import { findElements, getAttributes, isElement, resolveElement } from '../utils/elements'
+import { missingArg } from '../utils/errors'
 import { guid } from '../utils/guid'
 import { contains, each, head, removeFromList } from '../utils/lists'
 import { assign, isString } from '../utils/objects'
-import { _, DEFAULT, DURATION, EASING, INITIAL, NAME, S_TARGET, S_TRANSITION } from '../utils/constants'
-import {  missingArg } from '../utils/errors'
+
+// import from internal
+import { getEngine } from './engine'
 import { elementToTarget, ITargetOptions, target, Target } from './target'
 import { elementToTransition, ITransitionOptions, transition, Transition } from './transition'
 import { Dictionary, ISetOperation, IStateTween, ITargetTween, ITimelineTween } from '../types'
-import { getEngine } from './engine'
 
 const sceneAttributeWhitelist = [NAME]
 
@@ -43,7 +46,8 @@ export class Scene {
     this.name = name || this.id
   }
 
-  add(...objects: (Target | Transition)[]): this {
+  add(...objects: (Target | Transition)[]): this;
+  add(): this {
     const self = this
     const args = arguments
     for (let i = 0, len = args.length; i < len; i++) {
@@ -58,7 +62,8 @@ export class Scene {
     return self
   }
 
-  remove(...objects: (Target | Transition)[]): this {
+  remove(...objects: (Target | Transition)[]): this;
+  remove(): this {
     const self = this
     const args = arguments
     for (let i = 0, len = args.length; i < len; i++) {
@@ -120,14 +125,12 @@ export class Scene {
       const state = target.states[toStateName]
 
       // skip update operation target doesn't have state
-      if (!state) {
-        continue
+      if (state) {
+        setOperations.push({
+          props: assign({}, _, target.props, state),
+          targets: target.targets
+        })
       }
-
-      const targets = target.targets()
-      const props = assign({}, _, target.props, state)
-
-      setOperations.push({ targets, props })
     }
 
     // tell animation engine to set the state directly
@@ -139,7 +142,12 @@ export class Scene {
 
   transition(...states: string[]) {
     const self = this
-    const transitions = self._transitions.reduce((c, n) => { c[n.name] = n; return c }, {} as Dictionary<Transition>)
+    const transitions = self._transitions.reduce(
+      (c, n) => {
+        c[n.name] = n
+        return c
+      },
+      {} as Dictionary<Transition>)
     const defaultTransition = self.defaultTransition && transitions[self.defaultTransition]
 
     // find a suitable transition between the states
@@ -151,7 +159,7 @@ export class Scene {
       const targetTweens: ITargetTween[] = []
 
       each(self._targets, (target, index) => {
-        const targetTransition = target.transition && transitions[target.transition]
+        const targetTransition = target.props[TRANSITION] && transitions[target.props[TRANSITION]]
 
         // lookup definition for the next state
         const toState = target.states[toStateName]
@@ -161,13 +169,13 @@ export class Scene {
         }
 
         // get duration from cascade of durations
-        const duration = target.duration
+        const duration = target.props[DURATION]
           || (targetTransition && targetTransition.duration)
           || (defaultTransition && defaultTransition.duration)
           || _
 
         // get easing from cascade of easings
-        const easing = target.easing
+        const easing = target.props[EASING]
           || (targetTransition && targetTransition.easing)
           || (defaultTransition && defaultTransition.easing)
           || _
@@ -198,7 +206,7 @@ export class Scene {
             assign({}, _, fromState),
             assign({}, _, toState)
           ],
-          targets: target.targets()
+          targets: target.targets
         })
       })
 

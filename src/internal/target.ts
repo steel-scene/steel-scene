@@ -1,17 +1,18 @@
 import { findElements, getAttributes, getTargets, isElement, resolveElement } from '../utils/elements'
 import { guid } from '../utils/guid'
 import { assign, isString } from '../utils/objects'
-import { _, S_STATE, STATES, SELECT, STEEL_TARGET } from '../utils/constants';
+import { _, NAME, S_STATE, STATES, SELECT, STEEL_TARGET } from '../utils/constants'
 import { AnimationTargetOptions, AnimationTarget, Dictionary } from '../types'
 
-const targetAttributeBlackList = [STATES, SELECT];
+const targetAttributeBlackList = [STATES, SELECT]
+const stateAttributeBlackList = [NAME]
 
 export const elementToTarget = ($target: Element): ITargetOptions => {
   const states: Dictionary<any> = {}
   findElements(S_STATE, $target).forEach(e => {
     const attributes = getAttributes(e, _)
     // tslint:disable-next-line:no-string-literal
-    states[attributes['name']] = attributes
+    states[attributes[NAME]] = attributes
   })
 
   // read all "state" elements
@@ -25,40 +26,15 @@ export const elementToTarget = ($target: Element): ITargetOptions => {
 export class Target {
   readonly id: string = guid()
 
-  duration: number
-  transition: string
-  easing: string
   currentState: string
 
-  _targets: (Element | {})[] = []
+  targets: AnimationTarget = []
   props: Dictionary<any> = {}
-  states: Dictionary<Dictionary<any>> = {}
+  states: Dictionary<{}> = {}
 
-  /** returns the targets */
-  targets(): AnimationTarget;
-  /** sets the targets, returns this */
-  targets(...animationTargets: AnimationTargetOptions[]): this;
-
-  targets(...animationTargets: AnimationTargetOptions[]): this | AnimationTarget {
+  on(stateName: string, props: {}): this {
     const self = this
-    if (!arguments.length) {
-      return self._targets
-    }
-
-    // unassign self from all current targets
-    self._targets.forEach(t => {
-      if (t[STEEL_TARGET]) {
-        t[STEEL_TARGET] = _
-      }
-    })
-
-    // detect targets
-    const targets = getTargets(animationTargets)
-
-    // reassign targets
-    targets.forEach(t => t[STEEL_TARGET] = self)
-
-    self._targets = targets
+    self.states[stateName] = assign({}, stateAttributeBlackList, props)
     return self
   }
 
@@ -77,6 +53,27 @@ export class Target {
 
     self.states = options[STATES]
     self.props = assign({}, targetAttributeBlackList, options)
+    return self
+  }
+
+  select(...animationTargets: AnimationTargetOptions[]): this;
+  select(): this {
+    const self = this
+    // unassign self from all current targets
+    self.targets.forEach(t => {
+      if (t[STEEL_TARGET]) {
+        t[STEEL_TARGET] = _
+      }
+    })
+
+    // detect targets
+    const targets = getTargets(arguments)
+
+    // reassign targets
+    targets.forEach(t => t[STEEL_TARGET] = self)
+
+    // add new targets
+    self.targets.push.apply(self.targets, targets)
     return self
   }
 }
@@ -108,7 +105,7 @@ export function target(animationTargets?: AnimationTargetOptions, options?: ITar
       }
     }
     if (!t) {
-      t = new Target().targets(targets)
+      t = new Target().select(targets)
     }
     if (options) {
       t.load(options)

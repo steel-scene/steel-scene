@@ -1,10 +1,31 @@
-import { elementToTarget } from '../../src/internal/target'
+import { elementToTarget, target } from '../../src/internal/target'
 import * as  assert from 'assert'
 
 const jsdom = require('mocha-jsdom')
 
 describe('target', () => {
   jsdom()
+
+  describe('on()', () => {
+    it('adds to the state', () => {
+      const myTarget = target({ x: 0, y: 0 })
+        .on('state1', { x: '100px', y: '100px' })
+        .on('next', { x: '200px', y: '200px' })
+
+      assert.deepEqual(myTarget.states['state1'], {
+        x: '100px', y: '100px'
+      })
+    })
+
+    it('ignores the name property', () => {
+      const myTarget = target({ x: 0, y: 0 })
+        .on('state1', { x: '100px', name: 'something' })
+
+      assert.deepEqual(myTarget.states['state1'], {
+        x: '100px'
+      })
+    })
+  })
 
   describe('elementToTarget', () => {
     it('should translate a <target> to a Target', () => {

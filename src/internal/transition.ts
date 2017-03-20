@@ -20,7 +20,7 @@ export class Transition {
   easing: string
 
   constructor(name: string) {
-    const self = this;
+    const self = this
     self.name = name || self.id
   }
 

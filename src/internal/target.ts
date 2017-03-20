@@ -3,17 +3,19 @@ import { guid } from '../utils/guid'
 import { assign, isString } from '../utils/objects'
 import { _, NAME, S_STATE, STATES, SELECT, STEEL_TARGET } from '../utils/constants'
 import { AnimationTargetOptions, AnimationTarget, Dictionary } from '../types'
+import { getEngine } from './engine'
 
 const targetAttributeBlackList = [STATES, SELECT]
 const stateAttributeBlackList = [NAME]
 
 export const elementToTarget = ($target: Element): ITargetOptions => {
   const states: Dictionary<any> = {}
-  findElements(S_STATE, $target).forEach(e => {
-    const attributes = getAttributes(e, _)
+  const elements = findElements(S_STATE, $target)
+  for (let i = 0, ilen = elements.length; i < ilen; i++) {
+    const attributes = getAttributes(elements[i], _)
     // tslint:disable-next-line:no-string-literal
     states[attributes[NAME]] = attributes
-  })
+  }
 
   // read all "state" elements
   // assemble state elements and properties and to the list
@@ -60,20 +62,42 @@ export class Target {
   select(): this {
     const self = this
     // unassign self from all current targets
-    self.targets.forEach(t => {
+    for (let i = 0, ilen = self.targets.length; i < ilen; i++) {
+      const t = self.targets
       if (t[STEEL_TARGET]) {
         t[STEEL_TARGET] = _
       }
-    })
+    }
 
     // detect targets
     const targets = getTargets(arguments)
 
     // reassign targets
-    targets.forEach(t => t[STEEL_TARGET] = self)
+    for (let i = 0, ilen = targets.length; i < ilen; i++) {
+      targets[i][STEEL_TARGET] = self
+    }
 
     // add new targets
     self.targets.push.apply(self.targets, targets)
+    return self
+  }
+
+   set(toStateName: string) {
+    const self = this
+    const state = self.states[toStateName]
+
+    // skip update operation target doesn't have state
+    if (state) {
+      // tell animation engine to set the state directly
+      getEngine().set([
+        {
+          props: assign({}, _, self.props, state),
+          targets: self.targets
+        }
+      ])
+      self.currentState = toStateName
+    }
+
     return self
   }
 }

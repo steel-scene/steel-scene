@@ -10,7 +10,7 @@ import { assign, isString } from '../utils/objects'
 import { getEngine } from './engine'
 import { elementToTarget, ITargetOptions, target, Target } from './target'
 import { elementToTransition, ITransitionOptions, transition, Transition } from './transition'
-import { Dictionary, ISetOperation, IStateTween, ITargetTween, ITimelineTween } from '../types'
+import { Dictionary, IStateTween, ITargetTween, ITimelineTween } from '../types'
 
 const sceneAttributeWhitelist = [NAME]
 
@@ -119,22 +119,9 @@ export class Scene {
   set(toStateName: string) {
     const self = this
 
-    const setOperations: ISetOperation[] = []
-    for (const targetName in self._targets) {
-      const target = self._targets[targetName]
-      const state = target.states[toStateName]
-
-      // skip update operation target doesn't have state
-      if (state) {
-        setOperations.push({
-          props: assign({}, _, target.props, state),
-          targets: target.targets
-        })
-      }
+    for (let i = 0, ilen = self._targets.length; i < ilen; i++) {
+      self._targets[i].set(toStateName)
     }
-
-    // tell animation engine to set the state directly
-    getEngine().set(setOperations)
 
     self.currentState = toStateName
     return self

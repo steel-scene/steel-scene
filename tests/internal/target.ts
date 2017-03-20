@@ -12,6 +12,7 @@ describe('target', () => {
         .on('state1', { x: '100px', y: '100px' })
         .on('next', { x: '200px', y: '200px' })
 
+      // tslint:disable-next-line:no-string-literal
       assert.deepEqual(myTarget.states['state1'], {
         x: '100px', y: '100px'
       })
@@ -21,6 +22,7 @@ describe('target', () => {
       const myTarget = target({ x: 0, y: 0 })
         .on('state1', { x: '100px', name: 'something' })
 
+      // tslint:disable-next-line:no-string-literal
       assert.deepEqual(myTarget.states['state1'], {
         x: '100px'
       })

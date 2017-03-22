@@ -16,10 +16,6 @@ export const head = <TInput>(items: List<TInput>, func: { (input: TInput): boole
   return _
 }
 
-export const contains = <TInput>(items: TInput[], item: TInput) => {
-  return items.indexOf(item) !== -1
-}
-
 export const removeFromList = <TInput>(items: TInput[], item: TInput) => {
   const index = items.indexOf(item)
   if (index !== -1) {

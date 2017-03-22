@@ -23,15 +23,8 @@ describe('dom', () => {
       $target.appendChild($stateInitial)
       $target.appendChild($stateLeft)
 
-
-      const $transition = document.createElement('s-transition')
-      $transition.setAttribute('default', '')
-      $transition.setAttribute('duration', '1000')
-      $transition.setAttribute('easing', 'ease-in-out')
-
       const $scene = document.createElement('s-scene')
       $scene.appendChild($target)
-      $scene.appendChild($transition)
 
       const scene = elementToScene($scene)
       assert.deepEqual(scene, {
@@ -42,13 +35,6 @@ describe('dom', () => {
               initial: { name: 'initial', x: '0' },
               left: { name: 'left', x: '-200' }
             }
-          }
-        ],
-        transitions: [
-          {
-            default: true,
-            duration: 1000,
-            easing: 'ease-in-out'
           }
         ]
       })

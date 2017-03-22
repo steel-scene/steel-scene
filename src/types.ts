@@ -4,26 +4,23 @@ export type AnimationTarget = (Element | {})[]
 // types used by the plugin system
 export interface IAnimationEngine {
   set(to: ISetOperation[]): void
-  transition(to: ITimelineTween, onStateChange: (stateName: string) => void): void
+  transition(to: ITargetTimeline[]): void
 }
 
 export interface ISetOperation {
+  targetId: string
   targets: any[]
-  props: Dictionary<any>
+  props: {}
 }
 
-export interface ITimelineTween {
-  id: string
-  states: IStateTween[]
-}
-
-export interface IStateTween {
-  stateName: string
-  tweens: ITargetTween[]
-}
-
-export interface ITargetTween {
+export interface ITargetTimeline {
+  targetId: string
   targets: any[]
+  animations: ITargetAnimation[]
+  onStateChange: (stateName: string) => void
+}
+
+export interface ITargetAnimation {
   keyframes: Dictionary<any>[]
   duration: number
   easing: string

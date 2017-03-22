@@ -10,8 +10,6 @@ describe('dom', () => {
       const $element = document.createElement('div')
       $element.innerHTML = `
       <s-scene name="boxes">
-          <s-transition duration="1500" easing="Power2.easeOut" default />
-          <s-transition name="fast" duration="500" easing="Power3.easeInOut" />
           <s-target select="#box1">
             <s-state name="C" x="0" y="0" rotation="0deg" />
             <s-state name="NE" x="100px" y="-100px" rotation="45deg" />
@@ -40,18 +38,6 @@ describe('dom', () => {
                 C: { name: 'C', x: '0', y: '0', rotation: '0deg' },
                 NE: { name: 'NE', x: '100px', y: '-100px', rotation: '45deg' }
               }
-            }
-          ],
-          transitions: [
-            {
-              default: true,
-              duration: 1500,
-              easing: 'Power2.easeOut'
-            },
-            {
-              duration: 500,
-              easing: 'Power3.easeInOut',
-              name: 'fast'
             }
           ]
         }

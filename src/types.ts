@@ -21,6 +21,7 @@ export interface ITargetTimeline {
 }
 
 export interface ITargetAnimation {
+  stateName: string
   keyframes: Dictionary<any>[]
   duration: number
   easing: string

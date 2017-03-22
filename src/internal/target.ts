@@ -155,7 +155,8 @@ export class Target {
         keyframes: [
           assign({}, _, fromState),
           assign({}, _, toState)
-        ]
+        ],
+        stateName: toStateName
       })
     }
 

@@ -1,38 +1,18 @@
-import { List, Predicate } from '../types';
-import { _ } from './resources';
+import { List } from '../types'
+import { _ } from './constants'
 
-export const head = <T>(indexed: List<T>, predicate: Predicate<T>): T | undefined => {
-  if (!indexed) {
-    return _;
-  }
-
-  for (let i = 0, len = indexed.length; i < len; i++) {
-    const item = indexed[i];
-    if (predicate(item)) {
-      return item;
-    }
-  }
-  return _;
-};
-
-export const copyArray = <T>(items: List<T>): T[] => {
-  return Array.prototype.slice.call(items);
-};
-
-/**
- * Map function that skips undefined results
- */
-export const mapf = <TInput, TOutput>(items: List<TInput>, mapper: { (input: TInput, index?: number): TOutput | undefined }): TOutput[] => {
-  let output: TOutput[] | undefined = _;
+export const head = <TInput>(items: List<TInput>, func: { (input: TInput): boolean }): TInput  => {
   for (let i = 0, len = items.length; i < len; i++) {
-    const result = mapper(items[i], i);
-    if (result === _) {
-      continue;
+    if (func(items[i])) {
+      return items[i]
     }
-    if (output === _) {
-      output = [];
-    }
-    output.push(result);
   }
-  return output || [];
-};
+  return _
+}
+
+export const removeFromList = <TInput>(items: TInput[], item: TInput) => {
+  const index = items.indexOf(item)
+  if (index !== -1) {
+    items.splice(index, 1)
+  }
+}

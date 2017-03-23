@@ -1,23 +1,25 @@
 {
     "compilerOptions": {
+        "moduleResolution": "node",
+        "newLine": "LF",
+        "target": "es2015",
+        
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "declaration": true,
         "forceConsistentCasingInFileNames": true,
         "inlineSourceMap": false,
-        "moduleResolution": "node",
-        "newLine": "LF",
         "noFallthroughCasesInSwitch": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
+        "noImplicitAny": false,
+        "noImplicitReturns": false,
         "noImplicitUseStrict": true,
+        "noImplicitThis": true,
         "noUnusedLocals": true,
         "preserveConstEnums": false,
         "removeComments": true,
         "sourceMap": false,
-        "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "target": "es2015"
+        "strictNullChecks": false,
+        "suppressImplicitAnyIndexErrors": true
     },
     "exclude": [
         "dist",

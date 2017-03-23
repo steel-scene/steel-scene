@@ -1,25 +1,27 @@
 {
     "compilerOptions": {
+        "newLine": "LF",
+        "moduleResolution": "node",
+        "target": "es5",
+        "outDir": "lib",
+        "rootDir": "src",
+        
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "declaration": true,
         "forceConsistentCasingInFileNames": true,
         "inlineSourceMap": false,
-        "newLine": "LF",
-        "moduleResolution": "node",
         "noFallthroughCasesInSwitch": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
+        "noImplicitAny": false,
+        "noImplicitReturns": false,
         "noImplicitUseStrict": true,
+        "noImplicitThis": true,
         "noUnusedLocals": true,
         "preserveConstEnums": false,
         "removeComments": true,
-        "rootDir": "src",
         "sourceMap": false,
-        "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "target": "es5",
-        "outDir": "lib"
+        "strictNullChecks": false,
+        "suppressImplicitAnyIndexErrors": true
     },
     "exclude": [
         "dist",

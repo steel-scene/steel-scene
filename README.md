@@ -13,10 +13,110 @@
 
 ## Why use SteelScene?
 
-- Human readable code in HTML or JSON
+- Human readable code in HTML, JSON, and Fluent API
 - Zero config
 
 > Power this project up with 🌟s,  [^ star it please](https://github.com/steel-scene/steel-scene/stargazers).
+
+
+## Getting Started
+SteelScene has three important concepts.  ```targets``` to animate,  ```states``` to transition targets between, and ```scenes``` to control groups of targets.
+
+### Building Scenes
+There are three different ways to build out animations with SteelScene. [Demo Project on CodePen](https://codepen.io/notoriousb1t/project/editor/AqdnJX/)
+
+#### HTML
+SteelScene automatically will try to load scenes in the body when the document is ready.
+
+```html
+ <s-scene name="boxes" duration="800" easing="Power1.easeOut">
+    <s-target select="#box1">
+        <s-state name="middle" x="0" easing="Power2.easeOut" />
+        <s-state name="right" x="100px" />
+    </s-target>
+</s-scene>
+```
+
+#### JSON
+You can load JSON, HTML, or provide a document selector to load after the document is loaded.
+
+```js
+steel.load([
+   {
+      name: 'boxes',
+      duration: 800,
+      easing: 'Power1.easeOut',
+      targets: [
+         {
+            select: '#box1',
+            states: {
+               middle: { x: 0,  easing: 'Power2.easeOut' },
+               right: { x: '100px' }
+            }
+         }
+      ]
+   }
+])
+
+```
+
+#### Fluent API
+SteelScene also has a fluent API that is pretty simple.
+
+```js
+const box1 = steel
+	.target('#box1')
+	.on('middle', { x: 0, easing: 'Power2.easeOut' })
+	.on('right', { x: '100px' })
+
+const boxesScene = steel
+	.scene('boxes', { duration: 800, easing: 'Power1.easeOut' })
+	.add(box1)
+```
+
+### Changing states
+
+#### Transitioning a scene
+
+**A single transition**
+```js
+const boxScene = steel.scene('boxes')
+boxScene.transition('right')
+```
+
+**Multiple transitions in sequence**
+```js
+const boxScene = steel.scene('boxes')
+boxScene.transition(['right', 'middle'])
+```
+
+#### Transitioning a target
+
+**Transitioning a known state**
+```js
+const box1 = steel.target('#box1')
+box1.transition('right')
+```
+
+**Multiple transitions in sequence**
+```js
+const box1 = steel.target('#box1')
+box1.transition(['right', 'middle'])
+```
+
+#### Setting a target/scene
+
+**Immediately setting the state of all targets in a scene**
+```js
+const boxesScene = steel.scene('boxes')
+boxesScene.set('right')
+```
+
+**Immediately setting the state of a single target**
+```js
+const box1 = steel.target('#box1')
+box1.set('right')
+```
 
 ## Setup
 
@@ -32,82 +132,17 @@ Include this script
 npm install steel-scene --save
 ```
 
-## Getting Started
-There are two different ways to build out animations with SteelScene.  The most straightforward way is writing it as HTML before the page loads
+## Plugins
+Instead of reinventing web aniamtion, SteelScene works seamlessly with your existing animation library
 
-```html
-<div id="box1">BOX 1</div>
+ - [GSAP (GreenSock)](https://github.com/steel-scene/steel-scene-plugin-gsap)
 
-<s-scene name="boxes">
-    <s-state name="hiddenLeft" default>
-        <s-target select="#box1" opacity="0" x="-50px" />
-    </s-state>
-    <s-state name="reset">
-        <s-target select="#box1" opacity="1" x="0" />
-    </s-state>
-    <s-transition easing="ease-out" duration="250" default />
-</s-scene>
-```
-**In the example, we have a ```boxes``` scene which will start in the ```hiddenLeft``` state.**
+## Other notes
 
-- The scene contains two states, ```hiddenLeft``` and ```reset```.  ```hiddenLeft``` is marked as the ```default```.
-- Each state modifies the opacity and x property of ```#box1```.
-- The ```default``` transition instructs the animation engine to transition for 250 milliseconds and move along an ```ease-out``` curve.
+ - Transitions must have a duration (at this point)
+ - State properties override target properties, target properties override scene properties
+ - SteelScene will not work without using a Plugin
 
-**Here is an example of how to do the same thing using JSON:**
-
-```js
-const json = {
-    boxes: {
-        states: {
-            hiddenLeft: {
-                default: true,
-                targets: [
-                    { select: '#box1', opacity: '0', x: '-50px' }
-                ]
-            },
-            reset: {
-                targets: [
-                    { select: '#box1', opacity: '1', x: '0' }
-                ]
-            }
-        },
-        transitions: {
-            _: {
-                {  default: true, easing: 'ease-out', duration: 250 }
-            }
-        }
-    }
-};
-steel.importJSON(json);
-```
-
-**To transition from one state to another:**
-```js
-// transitions to reset
-steel.transition('boxes', 'reset');
-```
-
-**To transition between multiple states, keep adding more state names:**
-```js
-// transitions to reset and then to hidden-left
-steel.transition('boxes', 'reset', 'hiddenLeft', ...);
-```
-
-**To move directly to a state without a transition:**
-```js
-// go directly to reset, do not pass GO, do not collect $200
-steel.set('boxes', 'reset');
-```
-
-**Here are some other handy functions**
-```js
-// resets all scenes to their starting state
-steel.reset();
-
-// import new scenes from an element
-steel.importHTML(element);
-```
 
 ## What's next?
 

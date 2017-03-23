@@ -20,7 +20,10 @@
 
 
 ## Getting Started
-SteelScene has three important concepts.  ```targets``` to animate,  ```states``` to transition targets between, and ```scenes``` to control groups of targets.
+SteelScene has three important objects/concepts:  
+- ```targets``` to animate
+- ```states``` to transition targets between
+- ```scenes``` to control groups of targets
 
 ### Building Scenes
 There are three different ways to build out animations with SteelScene. [Demo Project on CodePen](https://codepen.io/notoriousb1t/project/editor/AqdnJX/)
@@ -76,43 +79,37 @@ const boxesScene = steel
 
 ### Changing states
 
-#### Transitioning a scene
-
-**A single transition**
+**Transition a scene**
 ```js
 const boxScene = steel.scene('boxes')
 boxScene.transition('right')
 ```
 
-**Multiple transitions in sequence**
+**Sequence states in a scene**
 ```js
 const boxScene = steel.scene('boxes')
 boxScene.transition(['right', 'middle'])
 ```
 
-#### Transitioning a target
-
-**Transitioning a known state**
+**Transition a specific target**
 ```js
 const box1 = steel.target('#box1')
 box1.transition('right')
 ```
 
-**Multiple transitions in sequence**
+**Sequence states in a target**
 ```js
 const box1 = steel.target('#box1')
 box1.transition(['right', 'middle'])
 ```
 
-#### Setting a target/scene
-
-**Immediately setting the state of all targets in a scene**
+**Set the state of a scene immediately**
 ```js
 const boxesScene = steel.scene('boxes')
 boxesScene.set('right')
 ```
 
-**Immediately setting the state of a single target**
+**Set the state of a target immediately**
 ```js
 const box1 = steel.target('#box1')
 box1.set('right')
@@ -133,20 +130,22 @@ npm install steel-scene --save
 ```
 
 ## Plugins
-Instead of reinventing web aniamtion, SteelScene works seamlessly with your existing animation library
+Instead of reinventing web animation, SteelScene works seamlessly with your existing animation library.  We currently have plugins for the following animation libraries:
 
  - [GSAP (GreenSock)](https://github.com/steel-scene/steel-scene-plugin-gsap)
 
+> Your library isn't here?  Put in an issue, so we can start writing a plugin
+
 ## Other notes
 
- - Transitions must have a duration (at this point)
- - State properties override target properties, target properties override scene properties
- - SteelScene will not work without using a Plugin
+ - Transitions must have a duration. (at this point)
+ - Properties cascade.  State properties override target properties. Target properties override scene properties.
+ - SteelScene is not an animation engine, it will not work without also loading a plugin to an animation library.
 
 
 ## What's next?
 
-Get a simple prototype working and posted.   Stay tuned!
+Get a simple prototype UI working and posted.   Stay tuned!
 
 ## Contributions
 

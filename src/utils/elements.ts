@@ -2,7 +2,6 @@ import { AnimationTargetOptions } from '../'
 import { isArray, isObject, isString, toFloat } from './objects'
 import { Dictionary } from '../types'
 import { _, BOOLEAN, NUMBER} from './constants'
-import { each } from './lists'
 
 const htmlTest = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/
 const slice = Array.prototype.slice
@@ -31,41 +30,20 @@ export const convertFromAttributeValue = (name: string, value: any): any => {
   return value
 }
 
-export const convertToAttributeValue = (name: string, value: any): any => {
-  const type = propertyTypes[name]
-  if (type === BOOLEAN) {
-    return value === true ? '' : _
-  }
-  if (type === NUMBER) {
-    return value !== _ ? value.toString() : _
-  }
-  return value
-}
-
-/**
- * read a single attribute
- */
-export const getAttribute = (el: Element, prop: string): string => {
-  return convertFromAttributeValue(prop, el.getAttribute(prop))
-}
-
 /**
  * read all attribute pairs into a regular dictionary
  */
 export const getAttributes = (el: Element, whitelist?: string[]): Dictionary<any> => {
   const hasWhitelist = whitelist && whitelist.length
   const result = {}
-  each(el.attributes, att => {
-    if (hasWhitelist && whitelist!.indexOf(att.name) === -1) {
+  for (let i = 0, ilen = el.attributes.length; i < ilen; i++) {
+    const att = el.attributes[i]
+    if (hasWhitelist && whitelist.indexOf(att.name) === -1) {
       return
     }
     result[att.name] = convertFromAttributeValue(att.name, att.value)
-  })
+  }
   return result
-}
-
-export const appendElement = (parent: Element, child: Element): void => {
-  parent.appendChild(child)
 }
 
 export const findElements = (selector: string, parent?: Element): Element[] => {
@@ -96,7 +74,7 @@ export function resolveElement(elOrSelector: Element | string, throwIfFalse?: bo
   return el
 };
 
-export function getTargets(targets: AnimationTargetOptions): (Element | {})[] {
+export const getTargets = (targets: AnimationTargetOptions): (Element | {})[] => {
     if (isString(targets)) {
         // if query selector, search for elements
         return slice.call(document.querySelectorAll(targets as string))

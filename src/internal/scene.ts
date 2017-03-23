@@ -1,5 +1,5 @@
 // import from utils
-import { _, INITIAL, NAME, S_TARGET, SELECT } from '../utils/constants';
+import { _, INITIAL, NAME, S_TARGET, SELECT, TARGETS } from '../utils/constants'
 import { findElements, getAttributes, isElement, resolveElement } from '../utils/elements'
 import { guid } from '../utils/guid'
 import { head, removeFromList } from '../utils/lists'
@@ -9,8 +9,6 @@ import { Dictionary } from '../types'
 // import from internal
 import { elementToTarget, ITargetOptions, target, Target } from './target'
 
-const sceneAttributeWhitelist = [NAME]
-
 let _scenes: Scene[] = []
 
 export const sceneElementToTargets = ($scene: Element): ITargetOptions[] => {
@@ -18,7 +16,7 @@ export const sceneElementToTargets = ($scene: Element): ITargetOptions[] => {
 }
 
 export const elementToScene = ($scene: Element): ISceneOptions => {
-  const sceneOptions = getAttributes($scene, sceneAttributeWhitelist) as ISceneOptions
+  const sceneOptions = getAttributes($scene, _) as ISceneOptions
   sceneOptions.targets = sceneElementToTargets($scene)
   return sceneOptions
 }
@@ -76,7 +74,7 @@ export class Scene {
       self.name = json.name
     }
 
-    self.props = assign({}, [NAME, SELECT], json)
+    self.props = assign({}, [NAME, SELECT, TARGETS], json)
     self.defaultState = INITIAL
     self.currentState = INITIAL
     return self
@@ -97,7 +95,7 @@ export class Scene {
   transition(states: string[]): this;
   transition(states: string | string[]) {
     const self = this
-    const targetOptions: ITargetOptions = assign({}, _, self.props)
+    const targetOptions: ITargetOptions = assign({ inherited: true }, _, self.props)
 
     for (let i = 0, ilen = self._targets.length; i < ilen; i++) {
       const target = self._targets[i]

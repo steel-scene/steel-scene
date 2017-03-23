@@ -1,12 +1,6 @@
 import { List } from '../types'
 import { _ } from './constants'
 
-export const each = <TInput>(items: List<TInput>, action: { (input: TInput, index?: number): void })  => {
-  for (let i = 0, len = items.length; i < len; i++) {
-    action(items[i], i)
-  }
-}
-
 export const head = <TInput>(items: List<TInput>, func: { (input: TInput): boolean }): TInput  => {
   for (let i = 0, len = items.length; i < len; i++) {
     if (func(items[i])) {

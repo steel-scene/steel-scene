@@ -2,8 +2,8 @@ import { findElements, getAttributes, getTargets, isElement, resolveElement } fr
 import { missingArg } from '../utils/errors'
 import { guid } from '../utils/guid'
 import { assign, isString } from '../utils/objects'
-import { _, DURATION, EASING, NAME, S_STATE, SELECT, STATES, STEEL_TARGET } from '../utils/constants'
-import { ITargetAnimation, AnimationTargetOptions, AnimationTarget, Dictionary } from '../types'
+import { _, DURATION, INHERITED, NAME, S_STATE, SELECT, STATES, STEEL_TARGET } from '../utils/constants'
+import { AnimationTargetOptions, AnimationTarget, Dictionary } from '../types'
 import { queueSet, queueTransition } from './engine'
 
 const targetAttributeBlackList = [STATES, SELECT]
@@ -89,7 +89,7 @@ export class Target {
     if (state) {
       // tell animation engine to set the state directly
       queueSet({
-        props: assign({}, _, self.props, state),
+        props: assign({}, [], self.props, state),
         targetId: self.id,
         targets: self.targets
       })
@@ -101,40 +101,29 @@ export class Target {
 
   transition(stateNames: string | string[], targetOptions?: ITargetOptions) {
     const self = this
-    const { props, states, targets } = self
-
-    const defaults = targetOptions && targetOptions.inherited ? targetOptions : _
-    const overrides = targetOptions && !targetOptions.inherited ? targetOptions : _
+    const { states, targets } = self
+    const inherited = targetOptions && targetOptions.inherited
 
     let fromStateName: string
-    const animations: ITargetAnimation[] = []
+    const createAnimation = (toStateName: string) => {
 
-    for (let i = 0, len = stateNames.length; i < len; i++) {
-      const toStateName = stateNames[i]
       // lookup definition for the next state
       const toState = states[toStateName]
-      if (!toState) {
-        // push undefined if nothing to do (this is necessary to keep multiple targets in sync)
-        animations.push(_)
-        return
-      }
+
+      // lookup last know state of this target
+      const fromState = states[fromStateName]
+
+      const options: ITargetOptions = assign(
+        {},
+        [INHERITED],
+        inherited ? targetOptions : _,
+        self.props,
+        toState,
+        !inherited ? targetOptions : _
+      )
 
       // get duration from cascade of durations
-      const duration = (overrides && overrides.duration)
-        || props[DURATION]
-        || (defaults && defaults.duration)
-        || _
-
-      // get easing from cascade of easings
-      const easing = (overrides && overrides.easing)
-        || props[EASING]
-        || (defaults && defaults.easing)
-        || _
-
-      // note: might be able to pass without an easing, not sure if good or bad
-      if (!easing) {
-        throw missingArg(EASING)
-      }
+      const { duration, easing } = options
 
       // the engine won't know what to do without a duration, will have to relax
       // this if  we add physics based durations
@@ -142,14 +131,23 @@ export class Target {
         throw missingArg(DURATION)
       }
 
-      // lookup last know state of this target
-      const fromState = states[fromStateName]
-
       // record the last known state of this target
       fromStateName = toStateName
 
-      // create a new tween with "from"" as 0 and "to"" as 1
-      animations.push({
+      if (!toState) {
+        // push undefined if nothing to do (this is necessary to keep multiple targets in sync)
+        return {
+          duration,
+          easing,
+          keyframes: [],
+          stateName: toStateName
+        }
+      }
+
+
+
+      // create a new tween with "from" as 0 and "to" as 1
+      return {
         duration,
         easing,
         keyframes: [
@@ -157,8 +155,12 @@ export class Target {
           assign({}, _, toState)
         ],
         stateName: toStateName
-      })
+      }
     }
+
+    const animations = isString(stateNames)
+      ? [createAnimation(stateNames as string)]
+      : (stateNames as string[]).map(createAnimation)
 
     // queue up this timeline
     queueTransition({

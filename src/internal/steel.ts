@@ -1,25 +1,19 @@
-import { findElements, resolveElement } from '../utils/elements'
+import { isString } from '../utils/objects'
+import { findElements, isElement, resolveElement } from '../utils/elements'
 import { _, S_SCENE } from '../utils/constants'
 import { elementToScene, ISceneOptions, scene } from './scene'
 
 export const elementToScenes = (el: Element) => findElements(S_SCENE, el).map(elementToScene)
 
 /**
- * Import scenes from JSON
+ * Import scenes from an existing DOM element or JSON
  */
-export const importJSON = (scenesOptions: ISceneOptions[]) => {
-  for (let i = 0, ilen = scenesOptions.length; i < ilen; i++) {
-    scene(_, scenesOptions[i])
-  }
-}
+export const load = (options: ISceneOptions[] | Element | string) => {
+  const json = isString(options) || isElement(options)
+      ? elementToScenes(resolveElement(options as (string | Element), true))
+      : options as ISceneOptions[]
 
-/**
- * Import scenes from an existing DOM element
- */
-export const importHTML = (options: Element | string) => {
-  importJSON(
-    elementToScenes(
-      resolveElement(options, true)
-    )
-  )
+  for (let i = 0, ilen = json.length; i < ilen; i++) {
+    scene(_, json[i])
+  }
 }

@@ -12,7 +12,7 @@ export const mapProperties = <TInput, TOutput>(input: Dictionary<TInput>, mapper
 }
 
 export function assign<T1 extends T2, T2>(target: T1, blacklist: string[], ...sources: (T1 | T2)[]): T1
-export function assign(target: {}, blacklist: string[]): {} {
+export function assign(target: {} = {}, blacklist: string[]): {} {
   const args = arguments
   const hasExclusions = !!(blacklist && blacklist.length)
 

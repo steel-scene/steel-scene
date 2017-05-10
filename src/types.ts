@@ -49,3 +49,34 @@ export type Predicate<T> = {
 export type Func<TInput, TOutput> = {
   (item: TInput): TOutput;
 }
+
+export interface ITargetOptions {
+  /** true if used as defaults. false if used as overrides. defaults to false  */
+  inherited?: boolean
+  /** number of milliseconds to animate the target  */
+  duration?: number
+  /** easing timing function to use  */
+  easing?: string
+  /** states to configure */
+  states?: Dictionary<Dictionary<any>>
+  /** element to select */
+  select?: string
+  [name: string]: boolean | number | string | Dictionary<any>
+}
+
+
+export interface ITargetState {
+  currentState: string
+  targets: AnimationTarget
+  props: Dictionary<any>
+  states: Dictionary<{}>
+}
+
+export interface ISteelState {
+  targets: Dictionary<ITargetState>
+}
+
+export interface ISteelAction<T extends string> {
+  type: T
+  id: string
+}

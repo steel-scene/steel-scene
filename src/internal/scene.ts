@@ -4,10 +4,11 @@ import { findElements, getAttributes, isElement, resolveElement } from '../utils
 import { guid } from '../utils/guid'
 import { head, removeFromList } from '../utils/lists'
 import { assign, isString } from '../utils/objects'
-import { Dictionary } from '../types'
+import { Dictionary, ITargetOptions } from '../types'
+import { elementToTarget } from '../data/targets/load-target'
 
 // import from internal
-import { elementToTarget, ITargetOptions, target, Target } from './target'
+import { target, Target } from './target'
 
 let _scenes: Scene[] = []
 

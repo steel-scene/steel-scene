@@ -1,14 +1,14 @@
 import { getTargets} from '../utils/elements'
 import { _, STEEL_TARGET, guid } from '../utils'
 import { AnimationTargetOptions, ITargetOptions } from '../types'
-import { loadTarget, setState, dispatch, updateStateDefinitions, mergeTargets, transitionState  } from '../data'
+import { loadTarget, setTargetState, dispatch, updateTargetState, updateTargetTargets, transitionTargetState  } from '../data'
 
 export class Target {
   constructor(private readonly id: string = guid()) {  }
 
   on(stateName: string, props: {}): this {
     const self = this
-    dispatch(updateStateDefinitions(this.id, stateName, props))
+    dispatch(updateTargetState(this.id, stateName, props))
     return self
   }
 
@@ -22,19 +22,19 @@ export class Target {
   select(...animationTargets: AnimationTargetOptions[]): this;
   select(): this {
     const self = this
-    dispatch(mergeTargets(self.id, getTargets(arguments)))
+    dispatch(updateTargetTargets(self.id, getTargets(arguments)))
     return self
   }
 
   set(toStateName: string) {
     const self = this
-    dispatch(setState(self.id, toStateName))
+    dispatch(setTargetState(self.id, toStateName))
     return self
   }
 
   transition(stateNames: string | string[], targetOptions?: ITargetOptions) {
     const self = this
-    dispatch(transitionState(self.id, stateNames, targetOptions))
+    dispatch(transitionTargetState(self.id, stateNames, targetOptions))
     return self
   }
 }

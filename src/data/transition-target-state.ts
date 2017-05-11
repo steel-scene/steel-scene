@@ -1,16 +1,17 @@
+import { ActionType } from './actions'
 import { ISteelAction, ITargetOptions, ISteelState } from '../types'
 import { queueTransition } from '../internal/engine'
 import { _, assign, DURATION, INHERITED, isString, missingArg } from '../utils'
 
-export const TARGET_TRANSITION = 'TARGET_TRANSITION'
+export const TRANSITION_TARGET_STATE = 'TARGET_TRANSITION'
 
-export interface ITransitionStateAction extends ISteelAction<'TARGET_TRANSITION'> {
+export interface ITransitionStateAction extends ISteelAction<ActionType.TRANSITION_TARGET_STATE> {
   id: string
   stateNames: string | string[]
   targetOptions?: ITargetOptions
 }
 
-export const onTransitionState = (store: ISteelState, action: ITransitionStateAction) => {
+export const onTransitionTargetState = (store: ISteelState, action: ITransitionStateAction) => {
   const { id, stateNames, targetOptions } = action
 
   const target = store.targets[id]
@@ -90,6 +91,6 @@ export const onTransitionState = (store: ISteelState, action: ITransitionStateAc
   return store
 }
 
-export const transitionState = (id: string, stateNames: string | string[], targetOptions?: ITargetOptions): ITransitionStateAction => {
-  return { id, type: TARGET_TRANSITION, stateNames, targetOptions }
+export const transitionTargetState = (id: string, stateNames: string | string[], targetOptions?: ITargetOptions): ITransitionStateAction => {
+  return { id, stateNames, targetOptions, type: ActionType.TRANSITION_TARGET_STATE }
 }

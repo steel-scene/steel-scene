@@ -1,14 +1,14 @@
+import { ActionType } from './actions'
 import { AnimationTarget, ISteelAction, ISteelState } from '../types'
 import { STEEL_TARGET } from '../utils'
 
-export const TARGET_TARGET_MERGE = 'TARGET_TARGET_MERGE'
 
-export interface IUpdateStateDefinitionAction extends ISteelAction<'TARGET_TARGET_MERGE'> {
+export interface IUpdateStateDefinitionAction extends ISteelAction<ActionType.UPDATE_TARGET_TARGETS> {
   id: string
   targets: AnimationTarget
 }
 
-export const onUpdateTargets = (store: ISteelState, action: IUpdateStateDefinitionAction) => {
+export const onUpdateTargetTargets = (store: ISteelState, action: IUpdateStateDefinitionAction) => {
   const { id, targets } = action
   const target = store.targets[id]
 
@@ -28,6 +28,6 @@ export const onUpdateTargets = (store: ISteelState, action: IUpdateStateDefiniti
   return store
 }
 
-export const mergeTargets = (id: string, targets: AnimationTarget): IUpdateStateDefinitionAction => {
-  return { targets, id, type: TARGET_TARGET_MERGE }
+export const updateTargetTargets = (id: string, targets: AnimationTarget): IUpdateStateDefinitionAction => {
+  return { targets, id, type: ActionType.UPDATE_TARGET_TARGETS }
 }

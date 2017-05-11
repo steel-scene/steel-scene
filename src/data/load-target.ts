@@ -1,30 +1,15 @@
-import { Dictionary, ITargetOptions, ISteelAction, ISteelState } from '../types'
-import { _, assign, getAttributes, findElements, isElement, isString, NAME, resolveElement, S_STATE, SELECT, STATES } from '../utils'
+import { ActionType } from './actions'
+import { ITargetOptions, ISteelAction, ISteelState } from '../types'
+import { elementToTarget } from '../internal/importer'
+import { _, assign, isElement, isString, resolveElement, SELECT, STATES } from '../utils'
 
 const targetAttributeBlackList = [STATES, SELECT]
 
-export const LOAD_TARGET = 'LOAD_TARGET'
-
-export interface ILoadTargetAction extends ISteelAction<'LOAD_TARGET'> {
+export interface ILoadTargetAction extends ISteelAction<ActionType.LOAD_TARGET> {
   id: string
   options: ITargetOptions | string | Element
 }
 
-export const elementToTarget = ($target: Element): ITargetOptions => {
-  const states: Dictionary<any> = {}
-  const elements = findElements(S_STATE, $target)
-  for (let i = 0, ilen = elements.length; i < ilen; i++) {
-    const attributes = getAttributes(elements[i], _)
-    // tslint:disable-next-line:no-string-literal
-    states[attributes[NAME]] = attributes
-  }
-
-  // read all "state" elements
-  // assemble state elements and properties and to the list
-  const props = getAttributes($target, _) as ITargetOptions
-  props.states = states
-  return props
-}
 
 export const onLoadTarget = (store: ISteelState, action: ILoadTargetAction) => {
   let options = action.options as ITargetOptions | string | Element
@@ -44,6 +29,6 @@ export const onLoadTarget = (store: ISteelState, action: ILoadTargetAction) => {
 }
 
 export const loadTarget = (id: string, options: ITargetOptions | string | Element): ILoadTargetAction => {
-  return { options, id, type: LOAD_TARGET }
+  return { options, id, type: ActionType.LOAD_TARGET }
 }
 

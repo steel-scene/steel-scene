@@ -72,11 +72,19 @@ export interface ITargetState {
   states: Dictionary<{}>
 }
 
+
+export interface ISceneOptions {
+  name?: string
+  targets: ITargetOptions[]
+
+  [propName: string]: string | ITargetOptions[]
+}
+
 export interface ISteelState {
   targets: Dictionary<ITargetState>
 }
 
-export interface ISteelAction<T extends string> {
+export interface ISteelAction<T extends number> {
   type: T
   id: string
 }

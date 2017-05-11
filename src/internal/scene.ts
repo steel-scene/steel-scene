@@ -1,26 +1,16 @@
 // import from utils
-import { _, INITIAL, NAME, S_TARGET, SELECT, TARGETS } from '../utils/constants'
-import { findElements, getAttributes, isElement, resolveElement } from '../utils/elements'
+import { _, INITIAL, NAME, SELECT, TARGETS } from '../utils/constants'
+import {  isElement, resolveElement } from '../utils/elements'
 import { guid } from '../utils/guid'
 import { head, removeFromList } from '../utils/lists'
 import { assign, isString } from '../utils/objects'
-import { Dictionary, ITargetOptions } from '../types'
-import { elementToTarget } from '../data/load-target'
+import { Dictionary, ISceneOptions, ITargetOptions } from '../types'
+import { elementToScene } from './importer'
 
 // import from internal
 import { target, Target } from './target'
 
 let _scenes: Scene[] = []
-
-export const sceneElementToTargets = ($scene: Element): ITargetOptions[] => {
-  return findElements(S_TARGET, $scene).map(elementToTarget)
-}
-
-export const elementToScene = ($scene: Element): ISceneOptions => {
-  const sceneOptions = getAttributes($scene, _) as ISceneOptions
-  sceneOptions.targets = sceneElementToTargets($scene)
-  return sceneOptions
-}
 
 export class Scene {
   readonly id: string = guid()
@@ -105,13 +95,6 @@ export class Scene {
 
     return self
   }
-}
-
-export interface ISceneOptions {
-  name?: string
-  targets: ITargetOptions[]
-
-  [propName: string]: string | ITargetOptions[]
 }
 
 export const scene = (name?: string, options?: ISceneOptions) => {

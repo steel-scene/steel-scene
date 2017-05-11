@@ -1,7 +1,9 @@
 import { isString } from '../utils/objects'
 import { findElements, isElement, resolveElement } from '../utils/elements'
 import { _, S_SCENE } from '../utils/constants'
-import { elementToScene, ISceneOptions, scene } from './scene'
+import { scene } from './scene'
+import { ISceneOptions } from '../types'
+import { elementToScene } from './importer'
 
 export const elementToScenes = (el: Element) => findElements(S_SCENE, el).map(elementToScene)
 

@@ -1,16 +1,15 @@
+import { ActionType } from './actions'
 import { Dictionary, ISteelAction, ISteelState } from '../types'
 import { assign, SELECT, STATES } from '../utils'
 
 const targetBlackList = [STATES, SELECT]
 
-export const TARGET_PROPS_MERGE = 'TARGET_PROPS_MERGE'
-
-export interface IUpdatePropsAction extends ISteelAction<'TARGET_PROPS_MERGE'> {
+export interface IUpdatePropsAction extends ISteelAction<ActionType.UPDATE_TARGET_PROPS> {
   id: string
   targets: Dictionary<any>
 }
 
-export const onUpdateProps = (store: ISteelState, action: IUpdatePropsAction) => {
+export const onUpdateTargetProps = (store: ISteelState, action: IUpdatePropsAction) => {
   const { id, targets } = action
   const target = store.targets[id]
   if (target) {
@@ -19,10 +18,10 @@ export const onUpdateProps = (store: ISteelState, action: IUpdatePropsAction) =>
   return store
 }
 
-export const updateProps = (id: string, targets: Dictionary<any>): IUpdatePropsAction => {
+export const updateTargetProps = (id: string, targets: Dictionary<any>): IUpdatePropsAction => {
   return {
     id,
-    type: TARGET_PROPS_MERGE,
-    targets
+    targets,
+    type: ActionType.UPDATE_TARGET_PROPS
   }
 }

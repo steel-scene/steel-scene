@@ -1,25 +1,26 @@
 import { ISteelAction, ISteelState } from '../types'
-import { LOAD_TARGET, onLoadTarget } from './load-target'
-import { TARGET_SET, onSetState } from './set-state'
-import { TARGET_PROPS_MERGE, onUpdateProps } from './update-props'
-import { TARGET_STATE_MERGE, onUpdateStates } from './update-states'
-import { TARGET_TARGET_MERGE, onUpdateTargets } from './update-targets'
-import { TARGET_TRANSITION, onTransitionState } from './transition-state'
+import { ActionType } from './actions'
+import { onLoadTarget } from './load-target'
+import { onSetTargetState } from './set-target-state'
+import { onUpdateTargetProps } from './update-target-props'
+import { onUpdateTargetStates } from './update-target-states'
+import { onUpdateTargetTargets } from './update-target-targets'
+import { onTransitionTargetState } from './transition-target-state'
 
 let store: ISteelState = {
   targets: {}
 }
 
-const reducers: { [type: string]: (s: ISteelState, a: ISteelAction<string>) => ISteelState } = {
-  [LOAD_TARGET]: onLoadTarget,
-  [TARGET_SET]: onSetState,
-  [TARGET_PROPS_MERGE]: onUpdateProps,
-  [TARGET_STATE_MERGE]: onUpdateStates,
-  [TARGET_TARGET_MERGE]: onUpdateTargets,
-  [TARGET_TRANSITION]: onTransitionState
+const reducers: { [type: string]: (s: ISteelState, a: ISteelAction<number>) => ISteelState } = {
+  [ActionType.LOAD_TARGET]: onLoadTarget,
+  [ActionType.SET_TARGET_STATE]: onSetTargetState,
+  [ActionType.UPDATE_TARGET_PROPS]: onUpdateTargetProps,
+  [ActionType.UPDATE_TARGET_STATES]: onUpdateTargetStates,
+  [ActionType.UPDATE_TARGET_TARGETS]: onUpdateTargetTargets,
+  [ActionType.TRANSITION_TARGET_STATE]: onTransitionTargetState
 }
 
-const onUpdateAllTargets = (store2: ISteelState, action: ISteelAction<string>) => {
+const onUpdateAllTargets = (store2: ISteelState, action: ISteelAction<number>) => {
   const reducer = reducers[action.type]
   return reducer ? reducer(store2, action) : store2
 }
@@ -28,13 +29,13 @@ export function getState(): ISteelState {
   return store
 }
 
-export function dispatch(action: ISteelAction<string>): ISteelState {
+export function dispatch(action: ISteelAction<number>): ISteelState {
   return store = onUpdateAllTargets(store, action)
 }
 
 export { loadTarget } from './load-target'
-export { setState } from './set-state'
-export { transitionState } from './transition-state'
-export { updateProps } from './update-props'
-export { updateStateDefinitions } from './update-states'
-export { mergeTargets } from './update-targets'
+export { setTargetState } from './set-target-state'
+export { transitionTargetState } from './transition-target-state'
+export { updateTargetProps } from './update-target-props'
+export { updateTargetState } from './update-target-states'
+export { updateTargetTargets } from './update-target-targets'

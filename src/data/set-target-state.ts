@@ -1,15 +1,16 @@
+import { ActionType } from './actions'
 import { ISteelAction, ISteelState } from '../types'
 import { assign } from '../utils'
 import { queueSet } from '../internal/engine'
 
-export const TARGET_SET = 'TARGET_SET'
+export const SET_TARGET_STATE = 'TARGET_SET'
 
-export interface ISetStateAction extends ISteelAction<'TARGET_SET'> {
+export interface ISetStateAction extends ISteelAction<ActionType.SET_TARGET_STATE> {
   id: string
   stateName: string
 }
 
-export const onSetState = (store: ISteelState, action: ISetStateAction) => {
+export const onSetTargetState = (store: ISteelState, action: ISetStateAction) => {
   const { stateName, id } = action
   const target = store.targets[id]
   if (!target) {
@@ -32,6 +33,6 @@ export const onSetState = (store: ISteelState, action: ISetStateAction) => {
   return store
 }
 
-export const setState = (id: string, stateName: string): ISetStateAction => {
-  return { id, type: TARGET_SET, stateName }
+export const setTargetState = (id: string, stateName: string): ISetStateAction => {
+  return { id, stateName, type: ActionType.SET_TARGET_STATE }
 }

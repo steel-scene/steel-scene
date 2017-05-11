@@ -5,7 +5,7 @@ import { guid } from '../utils/guid'
 import { head, removeFromList } from '../utils/lists'
 import { assign, isString } from '../utils/objects'
 import { Dictionary, ITargetOptions } from '../types'
-import { elementToTarget } from '../data/targets/load-target'
+import { elementToTarget } from '../data/load-target'
 
 // import from internal
 import { target, Target } from './target'

@@ -1,6 +1,6 @@
-import { ISteelAction, ITargetState } from '../../types'
-import { assign } from '../../utils'
-import { queueSet } from '../../internal/engine'
+import { ISteelAction, ISteelState } from '../types'
+import { assign } from '../utils'
+import { queueSet } from '../internal/engine'
 
 export const TARGET_SET = 'TARGET_SET'
 
@@ -9,13 +9,14 @@ export interface ISetStateAction extends ISteelAction<'TARGET_SET'> {
   stateName: string
 }
 
-export const onSetState = (target: ITargetState, action: ISetStateAction) => {
-  if (action.type !== TARGET_SET) {
-    return target
+export const onSetState = (store: ISteelState, action: ISetStateAction) => {
+  const { stateName, id } = action
+  const target = store.targets[id]
+  if (!target) {
+    return store
   }
-  const toStateName = action.stateName
-  const state = target.states[toStateName]
 
+  const state = target.states[stateName]
   // skip update operation target doesn't have state
   if (state) {
     // tell animation engine to set the state directly
@@ -25,10 +26,10 @@ export const onSetState = (target: ITargetState, action: ISetStateAction) => {
       targets: target.targets
     })
 
-    target.currentState = toStateName
+    target.currentState = stateName
   }
 
-  return target
+  return store
 }
 
 export const setState = (id: string, stateName: string): ISetStateAction => {

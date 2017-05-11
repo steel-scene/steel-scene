@@ -1,6 +1,5 @@
-import { Dictionary, ITargetOptions, ISteelAction } from '../../types'
-import { _, assign, getAttributes, findElements, isElement, isString, NAME, resolveElement, S_STATE, SELECT, STATES }
-  from '../../utils'
+import { Dictionary, ITargetOptions, ISteelAction, ISteelState } from '../types'
+import { _, assign, getAttributes, findElements, isElement, isString, NAME, resolveElement, S_STATE, SELECT, STATES } from '../utils'
 
 const targetAttributeBlackList = [STATES, SELECT]
 
@@ -27,25 +26,21 @@ export const elementToTarget = ($target: Element): ITargetOptions => {
   return props
 }
 
-export const onLoadTarget = (targets: {}, action: ILoadTargetAction) => {
-  if (action.type !== LOAD_TARGET) {
-    return targets
-  }
-
+export const onLoadTarget = (store: ISteelState, action: ILoadTargetAction) => {
   let options = action.options as ITargetOptions | string | Element
   if (isString(options) || isElement(options)) {
     const element = resolveElement(options as (string | Element), true)
     options = elementToTarget(element)
   }
 
-  targets[action.id] = assign(targets[action.id], _, {
+  store.targets[action.id] = assign(store.targets[action.id], _, {
     currentState: 'initial',
     props: assign({}, targetAttributeBlackList, options as ITargetOptions),
     states: (options && options[STATES]) || {},
     targets: []
   })
 
-  return targets
+  return store
 }
 
 export const loadTarget = (id: string, options: ITargetOptions | string | Element): ILoadTargetAction => {

@@ -5,7 +5,7 @@ import { _, assign, isElement, isString, resolveElement, SELECT, STATES } from '
 
 const targetAttributeBlackList = [STATES, SELECT]
 
-export interface ILoadTargetAction extends ISteelAction<ActionType.LOAD_TARGET> {
+export interface ILoadTargetAction extends ISteelAction {
   id: string
   options: ITargetOptions | string | Element
 }

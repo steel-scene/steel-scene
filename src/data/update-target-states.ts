@@ -4,7 +4,7 @@ import { assign, SELECT, STATES } from '../utils'
 
 const targetBlackList = [STATES, SELECT]
 
-export interface IUpdateStateDefinitionAction extends ISteelAction<ActionType.UPDATE_TARGET_STATES> {
+export interface IUpdateStateDefinitionAction extends ISteelAction {
   id: string
   stateName: string
   props: Dictionary<any>

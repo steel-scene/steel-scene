@@ -11,7 +11,7 @@ let store: ISteelState = {
   targets: {}
 }
 
-const reducers: { [type: string]: (s: ISteelState, a: ISteelAction<number>) => ISteelState } = {
+const reducers: { [type: string]: (s: ISteelState, a: ISteelAction) => ISteelState } = {
   [ActionType.LOAD_TARGET]: onLoadTarget,
   [ActionType.SET_TARGET_STATE]: onSetTargetState,
   [ActionType.UPDATE_TARGET_PROPS]: onUpdateTargetProps,
@@ -20,7 +20,7 @@ const reducers: { [type: string]: (s: ISteelState, a: ISteelAction<number>) => I
   [ActionType.TRANSITION_TARGET_STATE]: onTransitionTargetState
 }
 
-const onUpdateAllTargets = (store2: ISteelState, action: ISteelAction<number>) => {
+const onUpdateAllTargets = (store2: ISteelState, action: ISteelAction) => {
   const reducer = reducers[action.type]
   return reducer ? reducer(store2, action) : store2
 }
@@ -29,7 +29,7 @@ export function getState(): ISteelState {
   return store
 }
 
-export function dispatch(action: ISteelAction<number>): ISteelState {
+export function dispatch(action: ISteelAction): ISteelState {
   return store = onUpdateAllTargets(store, action)
 }
 

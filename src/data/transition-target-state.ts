@@ -5,7 +5,7 @@ import { _, assign, DURATION, INHERITED, isString, missingArg } from '../utils'
 
 export const TRANSITION_TARGET_STATE = 'TARGET_TRANSITION'
 
-export interface ITransitionStateAction extends ISteelAction<ActionType.TRANSITION_TARGET_STATE> {
+export interface ITransitionStateAction extends ISteelAction {
   id: string
   stateNames: string | string[]
   targetOptions?: ITargetOptions

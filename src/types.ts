@@ -84,7 +84,7 @@ export interface ISteelState {
   targets: Dictionary<ITargetState>
 }
 
-export interface ISteelAction<T extends number> {
-  type: T
+export interface ISteelAction {
+  type: number
   id: string
 }

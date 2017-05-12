@@ -3,7 +3,7 @@ import { AnimationTarget, ISteelAction, ISteelState } from '../types'
 import { STEEL_TARGET } from '../utils'
 
 
-export interface IUpdateStateDefinitionAction extends ISteelAction<ActionType.UPDATE_TARGET_TARGETS> {
+export interface IUpdateStateDefinitionAction extends ISteelAction {
   id: string
   targets: AnimationTarget
 }

@@ -5,7 +5,7 @@ import { queueSet } from '../internal/engine'
 
 export const SET_TARGET_STATE = 'TARGET_SET'
 
-export interface ISetStateAction extends ISteelAction<ActionType.SET_TARGET_STATE> {
+export interface ISetStateAction extends ISteelAction {
   id: string
   stateName: string
 }

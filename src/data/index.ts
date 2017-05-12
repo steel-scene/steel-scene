@@ -25,13 +25,11 @@ const onUpdateAllTargets = (store2: ISteelState, action: ISteelAction) => {
   return reducer ? reducer(store2, action) : store2
 }
 
-export function getState(): ISteelState {
+export const getState = () => {
   return store
 }
 
-export function dispatch(action: ISteelAction): ISteelState {
-  return store = onUpdateAllTargets(store, action)
-}
+export const dispatch = (action: ISteelAction) => store = onUpdateAllTargets(store, action)
 
 export { loadTarget } from './load-target'
 export { setTargetState } from './set-target-state'

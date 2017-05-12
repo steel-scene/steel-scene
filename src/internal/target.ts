@@ -3,7 +3,6 @@ import { _, STEEL_TARGET, guid } from '../utils'
 import { AnimationTargetOptions, ITargetOptions } from '../types'
 import {
   dispatch,
-  getState,
   loadTarget,
   setTargetState,
   transitionTargetState,
@@ -12,12 +11,7 @@ import {
 } from '../data'
 
 export class Target {
-
-  get states() {
-    return getState().targets[this.id].states
-  }
-
-  constructor(private readonly id: string = guid()) {  }
+  constructor(public readonly id: string = guid()) {  }
 
   on(stateName: string, props: {}): this {
     const self = this

@@ -1,5 +1,6 @@
 import { target } from '../../src/internal/target'
 import { elementToTarget } from '../../src/internal/importer'
+import { getState } from '../../src/data'
 import * as  assert from 'assert'
 const jsdom = require('jsdom')
 
@@ -13,7 +14,8 @@ describe('target', () => {
         .on('next', { x: '200px', y: '200px' })
 
       // tslint:disable-next-line:no-string-literal
-      assert.deepEqual(myTarget.states['state1'], {
+      const state = getState().targets[myTarget.id].states['state1']
+      assert.deepEqual(state, {
         x: '100px', y: '100px'
       })
     })
@@ -23,7 +25,9 @@ describe('target', () => {
         .on('state1', { x: '100px', name: 'something' })
 
       // tslint:disable-next-line:no-string-literal
-      assert.deepEqual(myTarget.states['state1'], {
+      const state = getState().targets[myTarget.id].states['state1']
+
+      assert.deepEqual(state, {
         x: '100px'
       })
     })

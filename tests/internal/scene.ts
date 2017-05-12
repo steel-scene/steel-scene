@@ -1,10 +1,9 @@
-import { elementToScene } from '../../src/internal/scene'
-
+import { elementToScene } from '../../src/internal/importer'
 import * as  assert from 'assert'
-const jsdom = require('mocha-jsdom')
+const jsdom = require('jsdom')
 
 describe('dom', () => {
-  jsdom()
+  const document = new jsdom.JSDOM().window.document
 
   describe('elementToScene', () => {
     it('should translate a <scene> to a Scene', () => {

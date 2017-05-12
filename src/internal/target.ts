@@ -1,9 +1,22 @@
 import { getTargets} from '../utils/elements'
 import { _, STEEL_TARGET, guid } from '../utils'
 import { AnimationTargetOptions, ITargetOptions } from '../types'
-import { loadTarget, setTargetState, dispatch, updateTargetState, updateTargetTargets, transitionTargetState  } from '../data'
+import {
+  dispatch,
+  getState,
+  loadTarget,
+  setTargetState,
+  transitionTargetState,
+  updateTargetState,
+  updateTargetTargets
+} from '../data'
 
 export class Target {
+
+  get states() {
+    return getState().targets[this.id].states
+  }
+
   constructor(private readonly id: string = guid()) {  }
 
   on(stateName: string, props: {}): this {

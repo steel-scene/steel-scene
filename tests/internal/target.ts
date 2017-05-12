@@ -1,10 +1,10 @@
-import { elementToTarget, target } from '../../src/internal/target'
+import { target } from '../../src/internal/target'
+import { elementToTarget } from '../../src/internal/importer'
 import * as  assert from 'assert'
-
-const jsdom = require('mocha-jsdom')
+const jsdom = require('jsdom')
 
 describe('target', () => {
-  jsdom()
+  const document = new jsdom.JSDOM().window.document
 
   describe('on()', () => {
     it('adds to the state', () => {

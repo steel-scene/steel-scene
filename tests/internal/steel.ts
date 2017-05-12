@@ -1,12 +1,13 @@
 import {  elementToScenes } from '../../src/internal/steel'
 import * as  assert from 'assert'
-const jsdom = require('mocha-jsdom')
+const jsdom = require('jsdom')
 
 describe('dom', () => {
-  jsdom()
+  const document = new jsdom.JSDOM().window.document
 
   describe('elementToScenes', () => {
     it('should detect multiple scenes in html', () => {
+
       const $element = document.createElement('div')
       $element.innerHTML = `
       <s-scene name="boxes">

@@ -1,8 +1,8 @@
 import { ActionType } from './actions'
 import { Dictionary, ISteelAction, ISteelState } from '../types'
-import { assign, SELECT, STATES } from '../utils'
+import { assign, NAME, SELECT, STATES } from '../utils'
 
-const targetBlackList = [STATES, SELECT]
+const targetBlackList = [STATES, SELECT, NAME]
 
 export interface IUpdateStateDefinitionAction extends ISteelAction {
   id: string

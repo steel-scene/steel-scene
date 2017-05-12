@@ -1,5 +1,5 @@
 import { assign } from '../../src/utils/objects'
-import * as  assert from 'assert';
+import * as  assert from 'assert'
 
 describe('objects', () => {
   describe('assign', () => {

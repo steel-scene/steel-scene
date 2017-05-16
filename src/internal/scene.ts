@@ -1,109 +1,49 @@
-// import from utils
-import { _, INITIAL, NAME, SELECT, TARGETS } from '../utils/constants'
-import {  isElement, resolveElement } from '../utils/elements'
-import { guid } from '../utils/guid'
-import { head, removeFromList } from '../utils/lists'
-import { assign, isString } from '../utils/objects'
-import { Dictionary, ISceneOptions, ITargetOptions } from '../types'
-import { elementToScene } from './importer'
-
-// import from internal
-import { target, Target } from './target'
-
-let _scenes: Scene[] = []
+import { _, findKey, map, guid } from '../utils'
+import { ISceneOptions } from '../types'
+import { addSceneTargets, loadScene, dispatch, getState, transitionSceneState, removeSceneTargets, setSceneState } from '../data'
+import { Target } from './target'
 
 export class Scene {
-  readonly id: string = guid()
-  _targets: Target[] = []
+  constructor(public readonly id: string = guid()) { }
 
-  props: Dictionary<any> = {}
-  defaultState: string
-  currentState: string
-  name: string
-
-  constructor(name: string) {
-    this.name = name || this.id
-  }
-
-  add(...objects: Target[]): this;
+  add(...objects: Target[]): this
   add(): this {
     const self = this
-    const args = arguments
-    for (let i = 0, len = args.length; i < len; i++) {
-      self._targets.push(args[i])
-    }
+    dispatch(addSceneTargets(self.id, map(arguments, a => a.id)))
     return self
   }
 
-  remove(...objects: Target[]): this;
+  remove(...objects: Target[]): this
   remove(): this {
     const self = this
-    const args = arguments
-    for (let i = 0, len = args.length; i < len; i++) {
-      removeFromList(self._targets, args[i])
-    }
+    dispatch(removeSceneTargets(self.id, map(arguments, a => a.id)))
     return self
   }
-
   load(options: ISceneOptions | Element | string) {
     const self = this
-    if (!options) {
-      return self
-    }
-
-    const json = isString(options) || isElement(options)
-      ? elementToScene(
-        resolveElement(options as (string | Element), true)
-      )
-      : options as ISceneOptions
-
-    if (json.targets && json.targets.length) {
-      self._targets = json.targets.map(s => target(s.select, s))
-    }
-
-    if (json.name) {
-      self.name = json.name
-    }
-
-    self.props = assign({}, [NAME, SELECT, TARGETS], json)
-    self.defaultState = INITIAL
-    self.currentState = INITIAL
+    dispatch(loadScene(self.id, options))
     return self
   }
-
   set(toStateName: string) {
     const self = this
-
-    for (let i = 0, ilen = self._targets.length; i < ilen; i++) {
-      self._targets[i].set(toStateName)
-    }
-
-    self.currentState = toStateName
+    dispatch(setSceneState(self.id, toStateName))
     return self
   }
-
-  transition(states: string): this;
-  transition(states: string[]): this;
+  transition(states: string): this
+  transition(states: string[]): this
   transition(states: string | string[]) {
     const self = this
-    const targetOptions: ITargetOptions = assign({ inherited: true }, _, self.props)
-
-    for (let i = 0, ilen = self._targets.length; i < ilen; i++) {
-      const target = self._targets[i]
-      target.transition(states, targetOptions)
-    }
-
+    dispatch(transitionSceneState(self.id, states))
     return self
   }
 }
 
-export const scene = (name?: string, options?: ISceneOptions) => {
+export const scene = (name?: string, options: ISceneOptions = {}) => {
   // if scene has a name try to locate an existing scene
-  let s: Scene = name ? head(_scenes, s2 => s2.name === name) : _
-
-  if (!s) {
-    s = new Scene(name)
-    _scenes.push(s)
+  let id = _
+  if (name) {
+    id = findKey(getState().scenes, s2 => s2.name === name)
+    options.name = name
   }
-  return s.load(options)
+  return new Scene(id).load(options)
 }

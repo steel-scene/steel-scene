@@ -1,9 +1,7 @@
-import { ActionType } from './actions'
+import { SET_TARGET_STATE } from './actions'
 import { ISteelAction, ISteelState } from '../types'
 import { assign } from '../utils'
 import { queueSet } from '../internal/engine'
-
-export const SET_TARGET_STATE = 'TARGET_SET'
 
 export interface ISetStateAction extends ISteelAction {
   id: string
@@ -12,14 +10,25 @@ export interface ISetStateAction extends ISteelAction {
 
 export const onSetTargetState = (store: ISteelState, action: ISetStateAction) => {
   const { stateName, id } = action
-  const target = store.targets[id]
-  if (!target) {
+  const scene = store.scenes[id]
+  if (!scene) {
     return store
   }
 
-  const state = target.states[stateName]
-  // skip update operation target doesn't have state
-  if (state) {
+  const targets = scene.targets
+  for (let i = 0, len = targets.length; i < len; i++) {
+    const targetId = targets[i]
+    const target = store.targets[targetId]
+    if (!target) {
+      continue
+    }
+
+    const state = target.states[stateName]
+    // skip update operation target doesn't have state
+    if (!state) {
+      continue
+    }
+
     // tell animation engine to set the state directly
     queueSet({
       props: assign({}, [], target.props, state),
@@ -34,5 +43,5 @@ export const onSetTargetState = (store: ISteelState, action: ISetStateAction) =>
 }
 
 export const setTargetState = (id: string, stateName: string): ISetStateAction => {
-  return { id, stateName, type: ActionType.SET_TARGET_STATE }
+  return { id, stateName, type: SET_TARGET_STATE }
 }

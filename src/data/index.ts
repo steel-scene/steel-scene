@@ -1,39 +1,45 @@
-import { ISteelAction, ISteelState } from '../types'
-import { ActionType } from './actions'
+import * as ActionType from './actions'
 import { onLoadTarget } from './load-target'
 import { onSetTargetState } from './set-target-state'
+import { onSetSceneState } from './set-scene-state'
 import { onUpdateTargetProps } from './update-target-props'
 import { onUpdateTargetStates } from './update-target-states'
 import { onUpdateTargetTargets } from './update-target-targets'
 import { onTransitionTargetState } from './transition-target-state'
+import { onTransitionSceneState } from './transition-scene-state'
+import { onAddSceneTargets } from './add-scene-targets'
+import { onRemoveSceneTargets } from './remove-scene-targets'
+import { onLoadScene } from './load-scene'
+import { Store } from './store'
+import { Dictionary, ISceneState, ITargetState } from '../types'
 
-let store: ISteelState = {
-  targets: {}
-}
+const store = new Store({
+    scenes: {} as Dictionary<ISceneState>,
+    targets: {} as Dictionary<ITargetState>
+  })
+  .register(ActionType.LOAD_TARGET, onLoadTarget)
+  .register(ActionType.SET_TARGET_STATE, onSetTargetState)
+  .register(ActionType.UPDATE_TARGET_PROPS, onUpdateTargetProps)
+  .register(ActionType.UPDATE_TARGET_STATES, onUpdateTargetStates)
+  .register(ActionType.UPDATE_TARGET_TARGETS, onUpdateTargetTargets)
+  .register(ActionType.TRANSITION_TARGET_STATE, onTransitionTargetState)
+  .register(ActionType.SET_SCENE_STATE, onSetSceneState)
+  .register(ActionType.TRANSITION_SCENE_STATE, onTransitionSceneState)
+  .register(ActionType.ADD_SCENE_TARGET, onAddSceneTargets)
+  .register(ActionType.REMOVE_SCENE_TARGET, onRemoveSceneTargets)
+  .register(ActionType.LOAD_SCENE, onLoadScene)
 
-const reducers: { [type: string]: (s: ISteelState, a: ISteelAction) => ISteelState } = {
-  [ActionType.LOAD_TARGET]: onLoadTarget,
-  [ActionType.SET_TARGET_STATE]: onSetTargetState,
-  [ActionType.UPDATE_TARGET_PROPS]: onUpdateTargetProps,
-  [ActionType.UPDATE_TARGET_STATES]: onUpdateTargetStates,
-  [ActionType.UPDATE_TARGET_TARGETS]: onUpdateTargetTargets,
-  [ActionType.TRANSITION_TARGET_STATE]: onTransitionTargetState
-}
-
-const onUpdateAllTargets = (store2: ISteelState, action: ISteelAction) => {
-  const reducer = reducers[action.type]
-  return reducer ? reducer(store2, action) : store2
-}
-
-export const getState = () => {
-  return store
-}
-
-export const dispatch = (action: ISteelAction) => store = onUpdateAllTargets(store, action)
+const { dispatch, getState } = store
+export { dispatch, getState }
 
 export { loadTarget } from './load-target'
+export { setSceneState } from './set-scene-state'
 export { setTargetState } from './set-target-state'
 export { transitionTargetState } from './transition-target-state'
 export { updateTargetProps } from './update-target-props'
 export { updateTargetState } from './update-target-states'
 export { updateTargetTargets } from './update-target-targets'
+export { transitionSceneState } from './transition-scene-state'
+export { addSceneTargets } from './add-scene-targets'
+export { removeSceneTargets } from './remove-scene-targets'
+export { loadScene } from './load-scene'

@@ -1,4 +1,4 @@
-import { ActionType } from './actions'
+import { UPDATE_TARGET_STATES } from './actions'
 import { Dictionary, ISteelAction, ISteelState } from '../types'
 import { assign, NAME, SELECT, STATES } from '../utils'
 
@@ -22,7 +22,7 @@ export const onUpdateTargetStates = (store: ISteelState, action: IUpdateStateDef
 export const updateTargetState = (id: string, stateName: string, props: Dictionary<any>): IUpdateStateDefinitionAction => {
   return {
     id,
-    type: ActionType.UPDATE_TARGET_STATES,
+    type: UPDATE_TARGET_STATES,
     stateName,
     props
   }

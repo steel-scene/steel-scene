@@ -72,7 +72,7 @@ export function resolveElement(elOrSelector: Element | string, throwIfFalse?: bo
     throw 'element not found'
   }
   return el
-};
+}
 
 export const getTargets = (targets: AnimationTargetOptions): (Element | {})[] => {
     if (isString(targets)) {

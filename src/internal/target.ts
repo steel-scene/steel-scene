@@ -1,5 +1,4 @@
-import { getTargets} from '../utils/elements'
-import { _, STEEL_TARGET, guid } from '../utils'
+import { _, STEEL_TARGET, getTargets, guid } from '../utils'
 import { AnimationTargetOptions, ITargetOptions } from '../types'
 import {
   dispatch,
@@ -18,27 +17,23 @@ export class Target {
     dispatch(updateTargetState(this.id, stateName, props))
     return self
   }
-
   /** loads from a selector, element, htmlString, or json options, returns this */
   load(options?: ITargetOptions | string | Element): this {
     const self = this
     dispatch(loadTarget(self.id, options))
     return self
   }
-
-  select(...animationTargets: AnimationTargetOptions[]): this;
+  select(...animationTargets: AnimationTargetOptions[]): this
   select(): this {
     const self = this
     dispatch(updateTargetTargets(self.id, getTargets(arguments)))
     return self
   }
-
   set(toStateName: string) {
     const self = this
     dispatch(setTargetState(self.id, toStateName))
     return self
   }
-
   transition(stateNames: string | string[], targetOptions?: ITargetOptions) {
     const self = this
     dispatch(transitionTargetState(self.id, stateNames, targetOptions))

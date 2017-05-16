@@ -1,9 +1,7 @@
-import { ActionType } from './actions'
+import { TRANSITION_TARGET_STATE } from './actions'
 import { ISteelAction, ITargetOptions, ISteelState } from '../types'
 import { queueTransition } from '../internal/engine'
 import { _, assign, DURATION, INHERITED, isString, missingArg } from '../utils'
-
-export const TRANSITION_TARGET_STATE = 'TARGET_TRANSITION'
 
 export interface ITransitionStateAction extends ISteelAction {
   id: string
@@ -92,5 +90,5 @@ export const onTransitionTargetState = (store: ISteelState, action: ITransitionS
 }
 
 export const transitionTargetState = (id: string, stateNames: string | string[], targetOptions?: ITargetOptions): ITransitionStateAction => {
-  return { id, stateNames, targetOptions, type: ActionType.TRANSITION_TARGET_STATE }
+  return { id, stateNames, targetOptions, type: TRANSITION_TARGET_STATE }
 }

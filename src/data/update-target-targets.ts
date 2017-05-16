@@ -1,7 +1,6 @@
-import { ActionType } from './actions'
+import { UPDATE_TARGET_TARGETS } from './actions'
 import { AnimationTarget, ISteelAction, ISteelState } from '../types'
 import { STEEL_TARGET } from '../utils'
-
 
 export interface IUpdateStateDefinitionAction extends ISteelAction {
   id: string
@@ -29,5 +28,5 @@ export const onUpdateTargetTargets = (store: ISteelState, action: IUpdateStateDe
 }
 
 export const updateTargetTargets = (id: string, targets: AnimationTarget): IUpdateStateDefinitionAction => {
-  return { targets, id, type: ActionType.UPDATE_TARGET_TARGETS }
+  return { targets, id, type:  UPDATE_TARGET_TARGETS }
 }

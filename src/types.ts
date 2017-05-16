@@ -27,7 +27,6 @@ export interface ITargetAnimation {
   easing: string
 }
 
-
 // common types
 /** set of key/value pairs, an object literal essentially */
 export type Dictionary<T> = {
@@ -64,7 +63,6 @@ export interface ITargetOptions {
   [name: string]: boolean | number | string | Dictionary<any>
 }
 
-
 export interface ITargetState {
   currentState: string
   targets: AnimationTarget
@@ -72,16 +70,24 @@ export interface ITargetState {
   states: Dictionary<{}>
 }
 
-
 export interface ISceneOptions {
   name?: string
-  targets: ITargetOptions[]
+  targets?: ITargetOptions[]
 
   [propName: string]: string | ITargetOptions[]
 }
 
 export interface ISteelState {
+  scenes: Dictionary<ISceneState>
   targets: Dictionary<ITargetState>
+}
+
+export interface ISceneState {
+  targets: string[]
+  props: Dictionary<any>
+  defaultState: string
+  currentState: string
+  name: string
 }
 
 export interface ISteelAction {

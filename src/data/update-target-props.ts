@@ -1,4 +1,4 @@
-import { ActionType } from './actions'
+import { UPDATE_TARGET_PROPS } from './actions'
 import { Dictionary, ISteelAction, ISteelState } from '../types'
 import { assign, SELECT, STATES } from '../utils'
 
@@ -22,6 +22,6 @@ export const updateTargetProps = (id: string, targets: Dictionary<any>): IUpdate
   return {
     id,
     targets,
-    type: ActionType.UPDATE_TARGET_PROPS
+    type: UPDATE_TARGET_PROPS
   }
 }

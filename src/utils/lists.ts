@@ -1,6 +1,10 @@
 import { List } from '../types'
 import { _ } from './constants'
 
+export const map = <TInput, TOutput>(items: List<TInput>, func: { (input: TInput): TOutput }) => {
+  return Array.prototype.map.call(items, func) as TOutput[]
+}
+
 export const head = <TInput>(items: List<TInput>, func: { (input: TInput): boolean }): TInput  => {
   for (let i = 0, len = items.length; i < len; i++) {
     if (func(items[i])) {

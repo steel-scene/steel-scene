@@ -90,7 +90,6 @@ export interface ISceneState {
   name: string
 }
 
-export interface ISteelAction {
-  type: number
-  id: string
+export interface IReducer<T> {
+  (store: T): T
 }

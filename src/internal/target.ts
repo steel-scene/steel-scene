@@ -1,13 +1,14 @@
 import { _, STEEL_TARGET, getTargets, guid } from '../utils'
 import { AnimationTargetOptions, ITargetOptions } from '../types'
 import {
-  dispatch,
   loadTarget,
   setTargetState,
   transitionTargetState,
   updateTargetState,
   updateTargetTargets
-} from '../data'
+} from '../actions'
+
+import { dispatch } from './store'
 
 export class Target {
   constructor(public readonly id: string = guid()) {  }

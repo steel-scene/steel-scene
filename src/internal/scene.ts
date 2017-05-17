@@ -1,6 +1,7 @@
 import { _, findKey, map, guid } from '../utils'
 import { ISceneOptions } from '../types'
-import { addSceneTargets, loadScene, dispatch, getState, transitionSceneState, removeSceneTargets, setSceneState } from '../data'
+import { addSceneTargets, loadScene, transitionSceneState, removeSceneTargets, setSceneState } from '../actions'
+import { dispatch, getState } from './store'
 import { Target } from './target'
 
 export class Scene {

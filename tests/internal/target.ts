@@ -1,6 +1,6 @@
 import { target } from '../../src/internal/target'
 import { elementToTarget } from '../../src/internal/importer'
-import { getState } from '../../src/data'
+import { getState } from '../../src/internal/store'
 import * as  assert from 'assert'
 const jsdom = require('jsdom')
 

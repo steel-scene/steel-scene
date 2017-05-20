@@ -1,5 +1,4 @@
 import { Dictionary, IAnimationEngine, ISetOperation, ITargetTimeline } from '../types'
-import { _ } from '../utils/constants'
 
 let engine: IAnimationEngine
 
@@ -16,9 +15,6 @@ const scheduleTweens = () => {
   for (const id in nextTweens) {
     const tween = nextTweens[id]
 
-    // remove from the queue
-    nextTweens[id] = _
-
     // make sure it isn't undefined
     if (tween) {
       // add tween to list of tweens to be processed
@@ -26,11 +22,12 @@ const scheduleTweens = () => {
     }
   }
 
+  timelineQueue = {}
+  timelineEnqueued = false
+
   if (tweens.length) {
     engine.transition(tweens)
   }
-
-  timelineEnqueued = false
 }
 
 const scheduleOperations = () => {

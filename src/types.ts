@@ -93,3 +93,7 @@ export interface ISceneState {
 export interface IReducer<T> {
   (store: T): T
 }
+
+export interface IObserver {
+  notify(obj: any, key: string, oldValue: any, newValue: any): void
+}

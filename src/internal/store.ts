@@ -1,5 +1,4 @@
 import { IReducer, ISteelState } from '../types'
-import { observe } from './observe'
 
 // timespan to wait for additional reducers after a new reducers is received
 const interval = 1000 / 60
@@ -8,23 +7,11 @@ const interval = 1000 / 60
 let isEnqueued = false
 let queue: IReducer<ISteelState>[] = []
 
-const observer = {
-  notify(obj: any, key: any, newVal: any, oldVal: any) {
-    console.table([obj.key, newVal, oldVal])
-  }
-}
-
 // initial state
 let currentState: ISteelState = {
   scenes: {},
   targets: {}
 }
-
-observe(
-  currentState,
-  observer,
-  () => console.log('changed')
-)
 
 // handles resolving new state from the queued reducers
 const resolveState = () => {

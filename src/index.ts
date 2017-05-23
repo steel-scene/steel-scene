@@ -6,6 +6,7 @@ export * from './types'
 export { scene } from './internal/scene'
 export { target } from './internal/target'
 export { load, setEngine as use }
+export { dispatch, subscribe, unsubscribe } from './internal/store'
 
 // auto-wire up document on DOMContentLoaded
 if (window && window.document) {

@@ -1,9 +1,9 @@
-import { ITargetOptions, ISteelState } from '../types'
+import { ITargetOptions, ISteelState, IStoreNotifier } from '../types'
 import { queueTransition } from '../internal/engine'
 import { _, assign, DURATION, INHERITED, isString, missingArg } from '../utils'
 
 export const transitionTargetState = (id: string, stateNames: string | string[], targetOptions?: ITargetOptions) => {
-  return (store: ISteelState) => {
+  return (store: ISteelState, notifier: IStoreNotifier) => {
     const target = store.targets[id]
     if (!target) {
       return store
@@ -78,6 +78,7 @@ export const transitionTargetState = (id: string, stateNames: string | string[],
       targets
     })
 
+    notifier.dirty(id)
     return store
   }
 }

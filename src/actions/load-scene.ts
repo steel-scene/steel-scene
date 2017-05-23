@@ -1,4 +1,4 @@
-import { ISceneState, ISceneOptions, ISteelState } from '../types'
+import { ISceneState, ISceneOptions, ISteelState, IStoreNotifier } from '../types'
 import { elementToScene } from '../internal/importer'
 import {  assign, guid, isElement, isString, INITIAL, resolveElement, SELECT, NAME, TARGETS } from '../utils'
 import { loadTarget } from './load-target'
@@ -6,7 +6,7 @@ import { loadTarget } from './load-target'
 const sceneBlacklist = [NAME, SELECT, TARGETS]
 
 export const loadScene = (id: string, options: ISceneOptions | string | Element) => {
-  return (store: ISteelState) => {
+  return (store: ISteelState, notifier: IStoreNotifier) => {
     if (!options) {
       return store
     }
@@ -29,7 +29,7 @@ export const loadScene = (id: string, options: ISceneOptions | string | Element)
       for (let i = 0, len = json.targets.length; i < len; i++) {
         const targetId = guid()
         const targetOptions = json.targets[i]
-        store = loadTarget(targetId, targetOptions)(store)
+        store = loadTarget(targetId, targetOptions)(store, notifier)
         scene.targets.push(targetId)
       }
     }
@@ -40,6 +40,7 @@ export const loadScene = (id: string, options: ISceneOptions | string | Element)
 
     scene.props = assign(scene.props, sceneBlacklist, json)
     store.scenes[id] = scene
+    notifier.dirty(id)
     return store
   }
 }

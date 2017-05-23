@@ -1,9 +1,9 @@
-import { ISteelState } from '../types'
+import { ISteelState, IStoreNotifier } from '../types'
 import { assign } from '../utils'
 import { queueSet } from '../internal/engine'
 
 export const setTargetState = (id: string, stateName: string) => {
-  return (store: ISteelState) => {
+  return (store: ISteelState, notifer: IStoreNotifier) => {
     const scene = store.scenes[id]
     if (!scene) {
       return store
@@ -31,6 +31,7 @@ export const setTargetState = (id: string, stateName: string) => {
       })
 
       target.currentState = stateName
+      notifer.dirty(id)
     }
 
     return store

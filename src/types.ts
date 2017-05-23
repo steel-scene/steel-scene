@@ -90,10 +90,20 @@ export interface ISceneState {
   name: string
 }
 
-export interface IReducer<T> {
-  (store: T): T
+export interface IReducer {
+  (store: ISteelState, notifier: IStoreNotifier): ISteelState
 }
 
 export interface IObserver {
   notify(obj: any, key: string, oldValue: any, newValue: any): void
+}
+
+export interface IStoreListener {
+  (store: ISteelState, updates: string[]): void
+}
+
+export interface IStoreNotifier {
+  dirty(id: string): void
+  subscribe(subscriber: IStoreListener): void
+  unsubscribe(subscriber: IStoreListener): void
 }

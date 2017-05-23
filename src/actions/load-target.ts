@@ -1,11 +1,11 @@
-import { ITargetOptions, ISteelState } from '../types'
+import { ITargetOptions, ISteelState, IStoreNotifier } from '../types'
 import { elementToTarget } from '../internal/importer'
 import { assign, isElement, isString, resolveElement, INITIAL, SELECT, STATES, getTargets } from '../utils'
 
 const targetAttributeBlackList = [STATES, SELECT]
 
 export const loadTarget = (id: string, options: ITargetOptions | string | Element) => {
-  return (store: ISteelState) => {
+  return (store: ISteelState, notifier: IStoreNotifier) => {
     if (isString(options) || isElement(options)) {
       const element = resolveElement(options as (string | Element), true)
       options = elementToTarget(element)
@@ -19,7 +19,7 @@ export const loadTarget = (id: string, options: ITargetOptions | string | Elemen
       states: targetOptions.states || {},
       targets: targetOptions.select ? getTargets(targetOptions.select) : []
     }
-
+    notifier.dirty(id)
     return store
   }
 }

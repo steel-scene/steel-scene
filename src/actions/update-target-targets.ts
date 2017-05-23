@@ -1,8 +1,8 @@
-import { AnimationTarget, ISteelState } from '../types'
+import { AnimationTarget, ISteelState, IStoreNotifier } from '../types'
 import { STEEL_TARGET } from '../utils'
 
 export const updateTargetTargets = (id: string, targets: AnimationTarget) => {
-  return (store: ISteelState) => {
+  return (store: ISteelState, notifier: IStoreNotifier) => {
     const target = store.targets[id]
 
     if (!target) {
@@ -18,6 +18,7 @@ export const updateTargetTargets = (id: string, targets: AnimationTarget) => {
       }
     }
 
+    notifier.dirty(id)
     return store
   }
 }

@@ -1,26 +1,16 @@
 import { ISteelState, IStoreNotifier } from '../types'
-import { assign } from '../utils'
-import { queueSet } from '../internal/engine'
+import { setSceneState } from './set-target-state'
 
-export const setSceneState = (id: string, stateName: string) => {
+export const setTargetState = (id: string, stateName: string) => {
   return (store: ISteelState, notifer: IStoreNotifier) => {
-    const target = store.targets[id]
-    if (!target) {
+    const scene = store.scenes[id]
+    if (!scene) {
       return store
     }
 
-    const state = target.states[stateName]
-    // skip update operation target doesn't have state
-    if (state) {
-      // tell animation engine to set the state directly
-      queueSet({
-        props: assign({}, [], target.props, state),
-        targetId: id,
-        targets: target.targets
-      })
-
-      target.currentState = stateName
-      notifer.dirty(id)
+    const { targets } = scene
+    for (let i = 0, len = targets.length; i < len; i++) {
+      store = setSceneState(targets[i], stateName)(store, notifer)
     }
 
     return store

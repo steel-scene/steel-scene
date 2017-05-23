@@ -4,7 +4,6 @@ import { STEEL_TARGET } from '../utils'
 export const updateTargetTargets = (id: string, targets: AnimationTarget) => {
   return (store: ISteelState, notifier: IStoreNotifier) => {
     const target = store.targets[id]
-
     if (!target) {
       return store
     }

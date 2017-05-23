@@ -10,7 +10,7 @@ export const addSceneTargets = (id: string, targets: string | string[]) => {
       const targetId = targets[i]
       if (scene.targets.indexOf(targetId) === -1) {
         scene.targets.push(targetId)
-        notifer.dirty(id)
+        notifer.dirty(targetId)
       }
     }
     return store

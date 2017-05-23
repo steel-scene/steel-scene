@@ -40,7 +40,6 @@ export const loadScene = (id: string, options: ISceneOptions | string | Element)
 
     scene.props = assign(scene.props, sceneBlacklist, json)
     store.scenes[id] = scene
-    notifier.dirty(id)
     return store
   }
 }

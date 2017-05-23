@@ -10,7 +10,7 @@ export const removeSceneTargets = (id: string, targets: string[]) => {
       const targetId = scene.targets[i]
       if (targets.indexOf(targetId) !== -1) {
         scene.targets.splice(i, 1)
-        notifer.dirty(id)
+        notifer.dirty(targetId)
       }
     }
     return store

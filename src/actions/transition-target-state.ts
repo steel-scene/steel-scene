@@ -12,14 +12,10 @@ export const transitionTargetState = (id: string, stateNames: string | string[],
     const { props, states, targets } = target
     const inherited = targetOptions && targetOptions.inherited
 
-    let fromStateName: string
     const createAnimation = (toStateName: string) => {
 
       // lookup definition for the next state
       const toState = states[toStateName]
-
-      // lookup last know state of this target
-      const fromState = states[fromStateName]
 
       const options: ITargetOptions = assign(
         {},
@@ -39,9 +35,6 @@ export const transitionTargetState = (id: string, stateNames: string | string[],
         throw missingArg(DURATION)
       }
 
-      // record the last known state of this target
-      fromStateName = toStateName
-
       if (!toState) {
         // push undefined if nothing to do (this is necessary to keep multiple targets in sync)
         return {
@@ -57,7 +50,6 @@ export const transitionTargetState = (id: string, stateNames: string | string[],
         duration,
         easing,
         keyframes: [
-          assign({}, _, fromState),
           assign({}, _, toState)
         ],
         stateName: toStateName

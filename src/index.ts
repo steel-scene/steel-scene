@@ -1,5 +1,6 @@
 import { load } from './internal/steel'
 import { setEngine } from './internal/engine'
+import { startRendering } from './internal/render'
 
 // export types and helpers to steel namespace
 export * from './types'
@@ -14,3 +15,6 @@ if (window && window.document) {
     load(document.body)
   })
 }
+
+// start listening to events and rendering results
+startRendering()

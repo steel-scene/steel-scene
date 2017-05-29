@@ -17,11 +17,9 @@ export interface ITargetTimeline {
   targetId: string
   targets: any[]
   animations: ITargetAnimation[]
-  onStateChange: (stateName: string) => void
 }
 
 export interface ITargetAnimation {
-  stateName: string
   keyframes: Dictionary<any>[]
   duration: number
   easing: string
@@ -64,10 +62,12 @@ export interface ITargetOptions {
 }
 
 export interface ITargetState {
-  currentState: string
+  currentState: string[]
+  scenes: string[]
   targets: AnimationTarget
   props: Dictionary<any>
   states: Dictionary<{}>
+  options?: ITargetOptions
 }
 
 export interface ISceneOptions {

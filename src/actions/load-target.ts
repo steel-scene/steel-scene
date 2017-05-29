@@ -14,8 +14,9 @@ export const loadTarget = (id: string, options: ITargetOptions | string | Elemen
     const targetOptions = (options || {}) as ITargetOptions
 
     store.targets[id] = {
-      currentState: INITIAL,
+      currentState: [INITIAL],
       props: assign({}, targetAttributeBlackList, targetOptions),
+      scenes: [],
       states: targetOptions.states || {},
       targets: targetOptions.select ? getTargets(targetOptions.select) : []
     }

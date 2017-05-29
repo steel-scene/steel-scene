@@ -45,7 +45,7 @@ export const plugin: IAnimationEngine = {
 
       for (let a = 0, ilen = timeline.animations.length; a < ilen; a++) {
         const animation = timeline.animations[a]
-        const { duration, easing, keyframes, stateName } = animation
+        const { duration, easing, keyframes } = animation
 
         // convert to seconds from milliseconds for GSAP
         const durationInSeconds = +duration * 0.001
@@ -57,9 +57,7 @@ export const plugin: IAnimationEngine = {
           const target = timeline.targets[j]
           const toState = keyframes[keyframes.length - 1]
 
-          const props = {
-            onComplete: () => timeline.onStateChange(stateName)
-          }
+          const props = {}
 
           if (easingFn) {
             // tslint:disable-next-line:no-string-literal

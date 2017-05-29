@@ -19,7 +19,7 @@ export const setSceneState = (id: string, stateName: string) => {
         targets: target.targets
       })
 
-      target.currentState = stateName
+      target.currentState = [stateName]
       notifer.dirty(id)
     }
 

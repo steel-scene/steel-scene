@@ -1,4 +1,4 @@
-import { setEngine } from '../../internal/engine'
 import { plugin } from './plugin'
 
-setEngine(plugin)
+declare const steel: any
+steel.use(plugin)

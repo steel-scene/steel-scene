@@ -1,16 +1,7 @@
 import { Dictionary } from '../types'
 import { _ } from './constants'
 
-export const mapProperties = <TInput, TOutput>(input: Dictionary<TInput>, mapper: (key: string, val: TInput) => TOutput): Dictionary<TOutput> => {
-  const output: Dictionary<TOutput> = {}
-  for (const key in input) {
-    if (input.hasOwnProperty(key)) {
-      output[key] = mapper(key, input[key])
-    }
-  }
-  return output
-}
-
+const { hasOwnProperty } = Object.prototype
 export const findKey = <TInput>(items: Dictionary<TInput>, func: { (value: TInput, key?: string): boolean }): string  => {
   for (let key in items) {
     const val = items[key]
@@ -48,6 +39,7 @@ export function assign(target: {} = {}, blacklist: string[]): {} {
   return target
 }
 
+export const hasOwn = (owner: {}, key: string) => hasOwnProperty.call(owner, key)
 export const toFloat = (numericString: string) => !numericString ? _ : parseFloat(numericString)
 export const isDefined = (a: any) => !!a || a === 0 || a === false
 export const isFunction = (a: any) => typeof a === 'function'

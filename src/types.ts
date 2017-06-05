@@ -3,14 +3,8 @@ export type AnimationTarget = (Element | {})[]
 
 // types used by the plugin system
 export interface IAnimationEngine {
-  set(to: ISetOperation[]): void
+  getTargets(targets: AnimationTargetOptions): {}[]
   transition(to: ITargetTimeline[]): void
-}
-
-export interface ISetOperation {
-  targetId: string
-  targets: any[]
-  props: {}
 }
 
 export interface ITargetTimeline {

@@ -1,8 +1,8 @@
-import { _, STEEL_TARGET, getTargets, guid } from '../utils'
+import { _, guid, listify, STEEL_TARGET } from '../utils'
 import { AnimationTargetOptions, ITargetOptions } from '../types'
+import { getEngine } from '../internal/engine'
 import {
   loadTarget,
-  setTargetState,
   transitionTargetState,
   updateTargetState,
   updateTargetTargets
@@ -11,7 +11,7 @@ import {
 import { dispatch } from './store'
 
 export class Target {
-  constructor(public readonly id: string = guid()) {  }
+  constructor(public readonly id: string = guid()) { }
 
   on(stateName: string, props: {}): this {
     const self = this
@@ -27,24 +27,19 @@ export class Target {
   select(...animationTargets: AnimationTargetOptions[]): this
   select(): this {
     const self = this
-    dispatch(updateTargetTargets(self.id, getTargets(arguments)))
+    dispatch(updateTargetTargets(self.id, getEngine().getTargets(arguments)))
     return self
   }
-  set(toStateName: string) {
+  set(stateNames: string | string[], targetOptions?: ITargetOptions) {
     const self = this
-    dispatch(setTargetState(self.id, toStateName))
-    return self
-  }
-  transition(stateNames: string | string[], targetOptions?: ITargetOptions) {
-    const self = this
-    dispatch(transitionTargetState(self.id, stateNames, targetOptions))
+    dispatch(transitionTargetState(self.id, listify(stateNames), targetOptions))
     return self
   }
 }
 
 export function target(animationTargets?: AnimationTargetOptions, options?: ITargetOptions): Target {
   // if transition has a name and is not auto-named, try to locate an existing scene
-  const targets = getTargets(animationTargets)
+  const targets = getEngine().getTargets(animationTargets)
 
   // if any targets could be resolved
   let id: string = _

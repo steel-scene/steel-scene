@@ -87,9 +87,7 @@ export const getTargets = (targets: AnimationTargetOptions): (Element | {})[] =>
         // if array or jQuery object, flatten to an array
       const elements: Element[] = []
       for (let i = 0, len = (targets as any[]).length; i < len; i++) {
-        const target = targets[i]
-        const innerElements = getTargets(target)
-        elements.push.apply(elements, innerElements)
+        elements.push.apply(elements, getTargets(targets[i]))
       }
       return elements
     }

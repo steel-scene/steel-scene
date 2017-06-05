@@ -1,6 +1,7 @@
 import { ITargetOptions, ISteelState, IStoreNotifier } from '../types'
 import { elementToTarget } from '../internal/importer'
-import { assign, isElement, isString, resolveElement, INITIAL, SELECT, STATES, getTargets } from '../utils'
+import { getEngine } from '../internal/engine'
+import { assign, isElement, isString, resolveElement, INITIAL, SELECT, STATES } from '../utils'
 
 const targetAttributeBlackList = [STATES, SELECT]
 
@@ -18,7 +19,7 @@ export const loadTarget = (id: string, options: ITargetOptions | string | Elemen
       props: assign({}, targetAttributeBlackList, targetOptions),
       scenes: [],
       states: targetOptions.states || {},
-      targets: targetOptions.select ? getTargets(targetOptions.select) : []
+      targets: targetOptions.select ? getEngine().getTargets(targetOptions.select) : []
     }
     notifier.dirty(id)
     return store

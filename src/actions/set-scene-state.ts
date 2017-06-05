@@ -1,16 +1,17 @@
-import { ISteelState, IStoreNotifier } from '../types'
-import { setSceneState } from './set-target-state'
+import { ITargetOptions, ISteelState, IStoreNotifier } from '../types'
+import { _, assign } from '../utils'
+import { transitionTargetState } from '.'
 
-export const setTargetState = (id: string, stateName: string) => {
-  return (store: ISteelState, notifer: IStoreNotifier) => {
+export const transitionSceneState = (id: string, stateNames: string[]) => {
+  return (store: ISteelState, notifier: IStoreNotifier) => {
     const scene = store.scenes[id]
     if (!scene) {
       return store
     }
 
-    const { targets } = scene
-    for (let i = 0, len = targets.length; i < len; i++) {
-      store = setSceneState(targets[i], stateName)(store, notifer)
+    const targetOptions: ITargetOptions = assign({ inherited: true }, _, scene.props)
+    for (let i = 0, ilen = scene.targets.length; i < ilen; i++) {
+      store = transitionTargetState(scene.targets[i], stateNames, targetOptions)(store, notifier)
     }
 
     return store

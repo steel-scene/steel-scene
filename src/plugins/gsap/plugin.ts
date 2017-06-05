@@ -1,23 +1,14 @@
-import { toCamelCase } from '../../utils'
-import { IAnimationEngine, ISetOperation, ITargetTimeline } from '../../types'
+import { getTargets, toCamelCase } from '../../utils'
+import { IAnimationEngine, ITargetTimeline } from '../../types'
 
 declare const TimelineLite: any
-declare const TweenLite: any
 declare const EaseLookup: any
 
 const ignoredProperties = ['name', 'easing']
 const inProgress: { [key: number]: typeof TimelineLite } = {}
 
 export const plugin: IAnimationEngine = {
-  set(setOperations: ISetOperation[]): void {
-    for (let i = 0, ilen = setOperations.length; i < ilen; i++) {
-      const op = setOperations[i]
-      for (let j = 0, jlen = op.targets.length; j < jlen; j++) {
-        const target = op.targets[j]
-        TweenLite.set(target, op.props)
-      }
-    }
-  },
+  getTargets,
   transition(timelines: ITargetTimeline[]): void {
     for (let t = 0, tlen = timelines.length; t < tlen; t++) {
       const timeline = timelines[t]

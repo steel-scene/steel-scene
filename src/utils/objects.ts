@@ -41,9 +41,11 @@ export function assign(target: {} = {}, blacklist: string[]): {} {
 
 export const hasOwn = (owner: {}, key: string) => hasOwnProperty.call(owner, key)
 export const toFloat = (numericString: string) => !numericString ? _ : parseFloat(numericString)
-export const isDefined = (a: any) => !!a || a === 0 || a === false
-export const isFunction = (a: any) => typeof a === 'function'
 export const isNumber = (a: any) => typeof a === 'number'
 export const isObject = (a: any) => typeof a === 'object' && !!a
 export const isString = (a: any) => typeof a === 'string'
-export const isArray = (a: any) => isDefined(a) && !isString(a) && !isFunction(a) && isNumber(a.length)
+export const isArray = (a: any) =>
+  (!!a || a === 0 || a === false)
+  && !isString(a)
+  && typeof a !== 'function'
+  && isNumber(a.length)

@@ -1,28 +1,30 @@
-import { ISteelState, IStoreNotifier } from '../types'
-import { assign } from '../utils'
-import { queueSet } from '../internal/engine'
+import { ITargetOptions, ISteelState, IStoreNotifier } from '../types'
+import { getStateHash } from '../utils'
 
-export const setSceneState = (id: string, stateName: string) => {
-  return (store: ISteelState, notifer: IStoreNotifier) => {
+export const transitionTargetState = (id: string, stateNames: string[], targetOptions?: ITargetOptions) => {
+  return (store: ISteelState, notifier: IStoreNotifier) => {
     const target = store.targets[id]
     if (!target) {
       return store
     }
 
-    const state = target.states[stateName]
-    // skip update operation target doesn't have state
-    if (state) {
-      // tell animation engine to set the state directly
-      queueSet({
-        props: assign({}, [], target.props, state),
-        targetId: id,
-        targets: target.targets
-      })
-
-      target.currentState = [stateName]
-      notifer.dirty(id)
+    // change if the property changed
+    let isChanged = false
+    if (getStateHash(target.currentState) !== getStateHash(stateNames)) {
+      isChanged = true
+      target.currentState = stateNames
     }
 
+    // change if the options changed
+    if (target.options !== targetOptions) {
+      target.options = targetOptions
+      isChanged = true
+    }
+
+    // notify change if any of the properties changed
+    if (isChanged) {
+      notifier.dirty(id)
+    }
     return store
   }
 }

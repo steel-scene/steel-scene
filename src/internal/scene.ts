@@ -1,21 +1,21 @@
-import { _, findKey, map, guid } from '../utils'
+import { _, findKey, guid, listify, map } from '../utils'
 import { ISceneOptions } from '../types'
-import { addSceneTargets, loadScene, transitionSceneState, removeSceneTargets, setSceneState } from '../actions'
+import { addSceneTargets, loadScene, removeSceneTargets, transitionSceneState } from '../actions'
 import { dispatch, getState } from './store'
 import { Target } from './target'
 
 export class Scene {
   constructor(public readonly id: string = guid()) { }
 
-  add(...objects: Target[]): this
-  add(): this {
+  addTarget(...objects: Target[]): this
+  addTarget(): this {
     const self = this
     dispatch(addSceneTargets(self.id, map(arguments, a => a.id)))
     return self
   }
 
-  remove(...objects: Target[]): this
-  remove(): this {
+  removeTarget(...objects: Target[]): this
+  removeTarget(): this {
     const self = this
     dispatch(removeSceneTargets(self.id, map(arguments, a => a.id)))
     return self
@@ -25,16 +25,9 @@ export class Scene {
     dispatch(loadScene(self.id, options))
     return self
   }
-  set(toStateName: string) {
+  set(stateNames: string | string[]) {
     const self = this
-    dispatch(setSceneState(self.id, toStateName))
-    return self
-  }
-  transition(states: string): this
-  transition(states: string[]): this
-  transition(states: string | string[]) {
-    const self = this
-    dispatch(transitionSceneState(self.id, states))
+    dispatch(transitionSceneState(self.id, listify(stateNames)))
     return self
   }
 }

@@ -20,9 +20,9 @@
 
 
 ## Getting Started
-SteelScene has three important objects/concepts:  
+SteelScene has three important objects/concepts:
 - ```targets``` to animate
-- ```states``` to transition targets between
+- ```states``` to add/remove/set
 - ```scenes``` to control groups of targets
 
 ### Building Scenes
@@ -74,45 +74,33 @@ const box1 = steel
 
 const boxesScene = steel
 	.scene('boxes', { duration: 800, easing: 'Power1.easeOut' })
-	.add(box1)
+	.addTarget(box1)
 ```
 
 ### Changing states
 
-**Transition a scene**
+**set a single state on all targets**
 ```js
 const boxScene = steel.scene('boxes')
-boxScene.transition('right')
+boxScene.setState('right')
 ```
 
-**Sequence states in a scene**
+**set multiple states on all targets**
 ```js
 const boxScene = steel.scene('boxes')
-boxScene.transition(['right', 'middle'])
+boxScene.setState(['right', 'middle'])
 ```
 
-**Transition a specific target**
+**set a single state to a target**
 ```js
 const box1 = steel.target('#box1')
-box1.transition('right')
+box1.setState('right')
 ```
 
-**Sequence states in a target**
+**set multiple states to a target*
 ```js
 const box1 = steel.target('#box1')
-box1.transition(['right', 'middle'])
-```
-
-**Set the state of a scene immediately**
-```js
-const boxesScene = steel.scene('boxes')
-boxesScene.set('right')
-```
-
-**Set the state of a target immediately**
-```js
-const box1 = steel.target('#box1')
-box1.set('right')
+box1.setState(['right', 'middle'])
 ```
 
 ## Setup
@@ -138,7 +126,7 @@ Instead of reinventing web animation, SteelScene works seamlessly with your exis
 
 ## Other notes
 
- - Transitions must have a duration. (at this point)
+ - Make sure to set a duration on the scene or on all targets. Without this, transitions won't work properly
  - Properties cascade.  State properties override target properties. Target properties override scene properties.
  - SteelScene is not an animation engine, it will not work without also loading a plugin to an animation library.
 

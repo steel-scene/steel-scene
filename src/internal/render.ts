@@ -1,7 +1,7 @@
 import { subscribe } from './store'
-import { ISteelState, ITargetOptions } from '../types'
-import { queueTransition } from '../internal/engine'
-import { hasOwn, DURATION, INHERITED, missingArg } from '../utils'
+import { ISteelState, ITargetOptions, ITargetTimeline } from '../types'
+import { getEngine } from '../internal/engine'
+import { _, hasOwn, DURATION, INHERITED, missingArg } from '../utils'
 
 const combineTargetProperty = (current: any, next: any): any => {
   return next
@@ -28,10 +28,10 @@ const combineTargetOptions = (targetOptions: ITargetOptions[]) => {
   return current
 }
 
-const updateTarget = (store: ISteelState, targetId: string) => {
+const getTween = (store: ISteelState, targetId: string) => {
   const target = store.targets[targetId]
   if (!target) {
-    return
+    return _
   }
 
   const { currentState, props, states, targets, options, scenes } = target
@@ -78,16 +78,23 @@ const updateTarget = (store: ISteelState, targetId: string) => {
   }]
 
   // queue up this timeline
-  queueTransition({
+  return {
     animations,
     targetId,
     targets
-  })
+  }
 }
 
 const render = (store: ISteelState, updates: string[]) => {
+  const tweens: ITargetTimeline[] = []
   for (let i = 0, len = updates.length; i < len; i++) {
-    updateTarget(store, updates[i])
+    const tween = getTween(store, updates[i])
+    if (tween) {
+      tweens.push(tween)
+    }
+  }
+  if (tweens.length) {
+    getEngine().transition(tweens)
   }
 }
 
